@@ -1,0 +1,44 @@
+MODEL:
+!First CALC section;
+!Purpose: Get number of bonds and liabilities;
+!before making the sets;
+CALC:
+NUM_BONDS = @POINTER( 1);
+ENDCALC
+
+SETS:
+BONDS/1 .. NUM_BONDS/: AMOUNT, PRICE, PV_B, DD_B, DC_B;
+ENDSETS
+
+! First DATA section;
+! Purpose: read in model data; 
+DATA:
+
+    PRICE = @POINTER( 2);
+    PV_B  = @POINTER( 3);
+    DD_B  = @POINTER( 4);
+    DC_B  = @POINTER( 5);
+    PV_L  = @POINTER( 6);
+    DD_L  = @POINTER( 7);
+    DC_L  = @POINTER( 8);
+
+ENDDATA
+
+MIN = @SUM(BONDS( J): PRICE( J)*AMOUNT( J));
+
+[PV] @SUM(BONDS( I): AMOUNT( I)*PV_B( I)) = PV_L;
+[DD] @SUM(BONDS( I): AMOUNT( I)*DD_B( I)) = DD_L;
+[DC] @SUM(BONDS( I): AMOUNT( I)*DC_B( I)) >= DC_L;
+
+
+!Second DATA section;
+!Purpose: Write the variables and model status;
+!to the pointers;
+DATA:
+
+    @POINTER( 9) = AMOUNT;
+    @POINTER(10) = @STATUS();
+
+ENDDATA
+
+END

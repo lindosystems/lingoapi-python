@@ -1,0 +1,60 @@
+MODEL:
+!First CALC section;
+!Purpose: Get number of bonds and liabilities;
+!before making the sets;
+CALC:
+NUM_BONDS       = @POINTER( 1);
+NUM_LIABILITIES = @POINTER( 2);
+ENDCALC
+
+SETS:
+BONDS/1 .. NUM_BONDS/: AMOUNT, PRICE;
+LIABILITIES/1 .. NUM_LIABILITIES/: L, SLACK, DUAL_PRICE;
+CASHFLOW(BONDS, LIABILITIES): F; 
+ENDSETS
+
+! First DATA section;
+! Purpose: read in model data; 
+DATA:
+
+    PRICE = @POINTER( 3);
+    L     = @POINTER( 4);
+    F     = @POINTER( 5);
+    
+ENDDATA
+
+SUBMODEL DedicatedPortfolio:
+MIN = @SUM(BONDS( J): PRICE( J)*AMOUNT( J));
+
+[FIRST_LIABILITIE] @SUM(BONDS( J): F( J, 1)*AMOUNT( J))  - SLACK( 1) = L( 1);
+@FOR(LIABILITIES( T)| T #GT# 1: [Tth_LIABILITIE] 
+        @SUM(BONDS( J): F( J, T)*AMOUNT( J)) + SLACK(T - 1) - SLACK( T) = L( T));
+ENDSUBMODEL
+
+!Second CALC section;
+!Purpose: Call solve then fill in the dual prices;
+CALC:
+
+    @SOLVE(DedicatedPortfolio);
+    DUAL_PRICE( 1) = - @DUAL( FIRST_LIABILITIE );
+    @FOR(LIABILITIES( I)| I #GE# 2:
+        DUAL_PRICE( I) = -@DUAL( Tth_LIABILITIE(I) );
+    );
+        
+ENDCALC
+
+!Second DATA section;
+!Purpose: Write the variables and model status;
+!to the pointers;
+DATA:
+
+    @POINTER( 6) = AMOUNT;
+    @POINTER( 7) = DUAL_PRICE;
+    @POINTER( 8) = @STATUS();
+
+ENDDATA
+
+
+
+
+END
