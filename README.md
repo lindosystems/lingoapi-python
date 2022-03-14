@@ -1,4 +1,4 @@
-# The Python Interface to LINDO API.
+# The Python Interface to LINGO.
 
 This package requires Lingo and a valid license key. Please refer to [Lingo user manual](https://lindo.com/downloads/PDF/LINGO.pdf) for installation instructions, and to learn more about the Lingo modeling language.
 
@@ -32,7 +32,7 @@ You can also try out the samples by
 
 ## Possible errors due to misconfiguration
 
-You may get the following error if your LINDOAPI_HOME environment variable is not set up.  
+You may get the following error if your LINGO_19_HOME environment variable is not set up.  
 
 ```
 Error: Environment variable LINGO_19_HOME should be set
