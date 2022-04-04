@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "19.0.0"
+VERSION = "19.0.1"
 
 class BuildData():
     """
@@ -38,7 +38,7 @@ numpyinclude = os.path.join(get_python_lib(
 
 # Gets the long description from README FILE
 setupDir = os.path.dirname(__file__)
-readmeFn = os.path.join(setupDir, "README")
+readmeFn = os.path.join(setupDir, "README.md")
 with open(readmeFn, encoding="utf-8") as f:
     long_description = f.read()
     f.close()
@@ -83,7 +83,7 @@ extension_kwargs = {
 lingomodule = Extension(**extension_kwargs)
 
 setup_kwargs = {"name" : 'lingo-api',
-                "version" : '19',
+                "version" : VERSION,
                 "description" : 'Python interface to LINGO API',
                 "long_description": long_description,
                 "author" : 'Zhe Liu',

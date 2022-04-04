@@ -1,3 +1,4 @@
+from .lingoExceptions import * 
 import os
 import sys
 import platform
@@ -32,7 +33,20 @@ def windows(bd:BuildData):
 #
 def linux(bd:BuildData):
     if bd.is_64bits:
-        cdll.LoadLibrary(os.path.join(bd.LINGO_HOME,"bin/linux64/libirc.so"))
+        print("New Test!")
+        libircPath = os.path.join(bd.LINGO_HOME,"bin/linux64/libirc.so")
+        try:
+            if os.path.isfile(libircPath):
+                print("is a file?")
+                cdll.LoadLibrary(libircPath)
+            else:
+                print("is not but not throwing the error??")
+                raise LoadException
+        except LoadException as e:
+            print(e.errorMessage)
+            exit(1)
+
+        
     else:
         cdll.LoadLibrary(os.path.join(bd.LINGO_HOME,"bin/linux/libirc.so"))
 
@@ -42,7 +56,7 @@ def main():
     bd = BuildData()
     #Environment variable LINDOAPI_HOME must be set
     if bd.LINGO_HOME == None:
-        print("Environment variable LINDOAPI_HOME should be set!")
+        print("Environment variable LINGO_19_HOME should be set!")
         exit(0)
     if bd.platform == 'Windows' or bd.platform == "CYGWIN_NT-6.3":
         windows(bd)

@@ -9,12 +9,25 @@ LSERR_INVALID_LICENSE_KEY_LNG       = 7
 LSERR_INVALID_VARIABLE_NAME_LNG     = 8
 LSERR_JNI_CALLBACK_NOT_FOUND        = 1000
 
+ErrorDict = {
+    LSERR_OUT_OF_MEMORY_LNG             :"Out of dynamic system memory.",
+    LSERR_UNABLE_TO_OPEN_LOG_FILE_LNG   :"Unable to open the log file",
+    LSERR_INVALID_NULL_POINTER_LNG      :"A NULL pointer was passed to a routine that was expecting a non-NULL pointer.",
+    LSERR_INVALID_INPUT_LNG             :"An input argument contained invalid input.",
+    LSERR_INFO_NOT_AVAILABLE_LNG        :"A request was made for information that is not currently available.",
+    LSERR_UNABLE_TO_COMPLETE_TASK_LNG   :"Unable to successfully complete the specified task.",
+    LSERR_INVALID_LICENSE_KEY_LNG       :"The license key passed to LScreateEnvLicenceLng() was invalid.",
+    LSERR_INVALID_VARIABLE_NAME_LNG     :"A variable name passed to LSgetCallbackVarPrimal() was invalid.",
+    LSERR_JNI_CALLBACK_NOT_FOUND        :"A valid callback function was not found",
+
+}
+
 LS_IINFO_VARIABLES_LNG              = 0
 LS_IINFO_VARIABLES_INTEGER_LNG      = 1
 LS_IINFO_VARIABLES_NONLINEAR_LNG    = 2
 LS_IINFO_CONSTRAINTS_LNG            = 3
 LS_IINFO_CONSTRAINTS_NONLINEAR_LNG  = 4
-LS_IINFO_NONZEROS_LNG= 5
+LS_IINFO_NONZEROS_LNG               = 5
 LS_IINFO_NONZEROS_NONLINEAR_LNG     = 6
 LS_IINFO_ITERATIONS_LNG             = 7
 LS_IINFO_BRANCHES_LNG               = 8
