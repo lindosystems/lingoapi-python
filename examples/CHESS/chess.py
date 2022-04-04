@@ -17,132 +17,79 @@ F - formula matrix F_ij number of nut_i needed in brand_j
 b - supply of each type of nut
 x - amount of each brand to produce
 
-The sample requires one additional library pandas for data frames.
 
 Input Files:
 The Lingo file `chess.lng` is loaded from the same directory as this script, and 
-contains the model. Finally model data can be entered in main().
+contains the model.
 
-Output:
-A data frame is displayed the brand names, the nut mixture, and the amount to produce.
-Finally, a `chess.log` is saved to the working directory and has the model, and output.
-This log file is very useful for debugging any changes.
+Output: print out
+
+Global optimum found!
+Brand      Peanut       Cashew     Produce
+==========================================
+Pawn         721.1538    48.0769   769.2308
+Knight         0.0000     0.0000     0.0000
+Bishopp        0.0000     0.0000     0.0000
+King          28.8462   201.9231   230.7692
+==========================================
+Totals          750.0      250.0     1000.0
 
 """
+
 import lingo_api as lingo
-import numpy
-import pandas as pd
+import numpy as np
 
-def chess(nutSupply, price, formula):
+lngFile = "chess.lng"
 
-    #create Lingo enviroment object
-    pEnv = lingo.pyLScreateEnvLng()
-    if pEnv is None:
-        print("cannot create LINGO environment!")
-        exit(1)
 
-    #open LINGO's log file
-    errorcode = lingo.pyLSopenLogFileLng(pEnv,'chess.log')
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
+SUPPLY     =  np.array( [750, 250])          # Total supply of each type
+PRICE      =  np.array( [2,3,4,5])           # price that each brand charge
+FORMULA    =  np.array( [[15,10, 6, 2],                                                    
+                            [1, 6,10,14]])      # formula matrix 
+peanut_i   = 0
+cashew_i   = 1
+PRODUCE    = np.zeros(len(PRICE))
+STATUS     = -1
 
-    #pass memory transfer pointers to LINGO
-    #define pnPointersNow
-    pnPointersNow = numpy.array([0],dtype=numpy.int32)
+NUT_COUNT   = len(SUPPLY)
+BRAND_COUNT = len(PRICE)
 
-    #@POINTER(1)
-    nutCount = len(nutSupply)
-    nutCountArray = numpy.array( [nutCount],dtype=numpy.double)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, nutCountArray, pnPointersNow)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
-    
-    #@POINTER(2)
-    brandCount = len(price)
-    brandCountArray = numpy.array( [brandCount],dtype=numpy.double)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, brandCountArray, pnPointersNow)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
+brandNames = np.array(["Pawn", "Knight", "Bishopp", "King"])    
+nutType    = np.array(["Peanut", "Cashew"])
 
-    #@POINTER(3)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, nutSupply, pnPointersNow)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
-    
-    #@POINTER(4)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, price, pnPointersNow)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
 
-    #@POINTER(5)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, formula.flatten(), pnPointersNow)   # Flatten matrix into vector
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
-    
-    #@POINTER(6)
-    produce = numpy.ones((brandCount), dtype=numpy.double)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, produce, pnPointersNow)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
-    produce = numpy.reshape(produce,(1,brandCount))
+pointerDict = {"Pointer1":NUT_COUNT,
+               "Pointer2":BRAND_COUNT, 
+               "Pointer3":SUPPLY, 
+               "Pointer4":PRICE, 
+               "Pointer5":FORMULA,
+               "Pointer6":PRODUCE, 
+               "Pointer7":STATUS
+               }
 
-    #@POINTER(7)
-    Status = numpy.array([-1.0],dtype=numpy.double)
-    errorcode = lingo.pyLSsetDouPointerLng(pEnv, Status, pnPointersNow)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
 
-    #Run the script
-    cScript = "SET ECHOIN 1 \n TAKE chess.lng \n GO \n QUIT \n"
-    errorcode = lingo.pyLSexecuteScriptLng(pEnv, cScript)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
+model = lingo.Model(lngFile , pointerDict,"log")
+lingo.solve(model)
 
-    #Close the log file
-    errorcode = lingo.pyLScloseLogFileLng(pEnv)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        print("errorcode = ", errorcode)
-        exit(1)
+STATUS  = model.get_pointer("Pointer7")
+PRODUCE = model.get_pointer("Pointer6")
 
-    if Status[0] == lingo.LS_STATUS_GLOBAL_LNG:
-        print("\nGlobal optimum found!")
-    elif Status[0] == lingo.LS_STATUS_LOCAL_LNG:
-        print("\nLocal optimum found!")
-    else:
-        print("\nSolution is non-optimal\n")
 
-    #delete Lingo enviroment object
-    errorcode = lingo.pyLSdeleteEnvLng(pEnv)
-    if errorcode != lingo.LSERR_NO_ERROR_LNG:
-        exit(1)
+if STATUS == lingo.LS_STATUS_GLOBAL_LNG:
+    print("\nGlobal optimum found!")
+elif STATUS == lingo.LS_STATUS_LOCAL_LNG:
+    print("\nLocal optimum found!")
+else:
+    print("\nSolution is non-optimal\n")
 
-    return produce
-
-def main():
-
-    nutSupply  =  numpy.array( [750, 250],dtype=numpy.double)          # Total supply of each type
-    price      =  numpy.array( [2,3,4,5],dtype=numpy.double)           # price that each brand charges
-    formula    =  numpy.array( [[15,10, 6, 2],                                                    
-                                [1, 6,10,14]], dtype=numpy.double)     # formula matrix 
-    brandNames = numpy.array(["Pawn", "Knight", "Bishopp", "King"])    
-    nutType    = numpy.array(["Peanut", "Cashew"])
-    produce = chess(nutSupply, price, formula)
-
-    # Pandas data frames for supplied model data and results from running the data
-    modelData  = pd.DataFrame(data=formula, index=nutType, columns=brandNames, dtype=(numpy.int64, numpy.int64))
-    resultData = pd.DataFrame(data=produce, index=["produce"], columns=brandNames)
-    # Combine the two for a print out or make a csv 
-    df = modelData.append(resultData)
-    print(df)
-    return 0
-
-main()
+totalPeanuts = np.sum(PRODUCE*FORMULA[peanut_i]/16)
+totalCashew  = np.sum(PRODUCE*FORMULA[cashew_i]/16)
+totalProduced = np.sum(PRODUCE)
+print(f"Brand      Peanut       Cashew     Produce")
+print(f"==========================================")
+for i in range(0,BRAND_COUNT):
+    peanuts = PRODUCE[i]*FORMULA[peanut_i,i]/16
+    cashews = PRODUCE[i]*FORMULA[cashew_i,i]/16
+    print(f"{brandNames[i]:10} {peanuts:10.4f} {cashews:10.4f} {PRODUCE[i]:10.4f}")
+print(f"==========================================")
+print(f"{'Totals':10} {totalPeanuts:10} {totalCashew:10} {totalProduced:10}")
