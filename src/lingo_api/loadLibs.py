@@ -40,7 +40,7 @@ def windows(bd:BuildData):
 #
 def linux(bd:BuildData):
 
-    libircPath = os.path.join(bd.LINGO_HOME,"bin/linux64/libirc.so")
+    libircPath = os.path.join(bd.LINGO64_HOME,"bin/linux64/libirc.so")
     try:
         if os.path.isfile(libircPath):
             cdll.LoadLibrary(libircPath)
