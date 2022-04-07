@@ -16,47 +16,50 @@ class BuildData():
         self.MAJOR = "19"
         self.MINOR = "0"
         self.LINGO_HOME = os.environ.get('LINGO_19_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_19_HOME')
         self.platform = platform.system()
         self.is_64bits = sys.maxsize > 2**32
+        self.pyMajor = sys.version_info[0]
+        self.pyMinor = sys.version_info[1]
 
 #
 # windows()
 # This function adds the dll directory at 
 # runtime
 def windows(bd:BuildData):
-    if (sys.version_info[0] == 3) and (sys.version_info[1] != 7):
-        os.add_dll_directory(bd.LINGO_HOME)
+
+    if (bd.pyMajor == 3) and (bd.pyMinor != 7):
+        if bd.is_64bits:
+            os.add_dll_directory(bd.LINGO64_HOME)
+        else:
+            os.add_dll_directory(bd.LINGO_HOME)
 
 #
 # linux()
 # This function loads the libirc.so from the appropriate bin dir
 #
 def linux(bd:BuildData):
-    if bd.is_64bits:
-        print("New Test!")
-        libircPath = os.path.join(bd.LINGO_HOME,"bin/linux64/libirc.so")
-        try:
-            if os.path.isfile(libircPath):
-                print("is a file?")
-                cdll.LoadLibrary(libircPath)
-            else:
-                print("is not but not throwing the error??")
-                raise LoadException
-        except LoadException as e:
-            print(e.errorMessage)
-            exit(1)
 
-        
-    else:
-        cdll.LoadLibrary(os.path.join(bd.LINGO_HOME,"bin/linux/libirc.so"))
+    libircPath = os.path.join(bd.LINGO_HOME,"bin/linux64/libirc.so")
+    try:
+        if os.path.isfile(libircPath):
+            cdll.LoadLibrary(libircPath)
+        else:
+            raise LoadException
+    except LoadException as e:
+        print(e.errorMessage)
+        exit(1)
 
 
     
 def main():
     bd = BuildData()
     #Environment variable LINDOAPI_HOME must be set
-    if bd.LINGO_HOME == None:
-        print("Environment variable LINGO_19_HOME should be set!")
+    if bd.LINGO_HOME == None and bd.is_64bits == False:
+        raise NoEviromentVar("LINGO_19_HOME", "Lingo19")
+        exit(0)
+    if bd.LINGO64_HOME == None and bd.is_64bits:
+        raise NoEviromentVar("LINGO64_19_HOME", "Lingo64_19")
         exit(0)
     if bd.platform == 'Windows' or bd.platform == "CYGWIN_NT-6.3":
         windows(bd)

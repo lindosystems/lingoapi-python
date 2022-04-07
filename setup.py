@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "19.0.1"
+VERSION = "19.0.2"
 
 class BuildData():
     """
@@ -20,6 +20,7 @@ class BuildData():
         self.MAJOR = "19"
         self.MINOR = "0"
         self.LINGO_HOME = os.environ.get('LINGO_19_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_19_HOME')
         self.platform = platform.system()
         self.is_64bits = sys.maxsize > 2**32
 
@@ -43,27 +44,24 @@ with open(readmeFn, encoding="utf-8") as f:
     long_description = f.read()
     f.close()
     
-if bd.LINGO_HOME == None:
-    print("Environment variable LINGO_19_HOME is empty!")
-    exit(0)
 
 if bd.platform == 'Windows':
-    IncludePath = bd.LINGO_HOME + '/Programming Samples'
-    LibPath = bd.LINGO_HOME + '/Programming Samples' 
+
     if bd.is_64bits:
-        LingoLib = 'Lingd64_'+ bd.MAJOR
+        IncludePath = bd.LINGO64_HOME + '/Programming Samples'
+        LibPath     = bd.LINGO64_HOME + '/Programming Samples' 
+        LingoLib    = 'Lingd64_' + bd.MAJOR
     else:
+        IncludePath = bd.LINGO_HOME + '/Programming Samples'
+        LibPath = bd.LINGO_HOME + '/Programming Samples' 
         LingoLib = 'Lingd' + bd.MAJOR
+
     extra_link_args = '-Wl,--enable-stdcall-fixup'
 
 if bd.platform == 'Linux':
-    IncludePath = os.path.join(bd.LINGO_HOME,'programming_samples')
-    if bd.is_64bits:
-        LingoLib = 'lingo64'
-        LibPath = os.path.join(bd.LINGO_HOME, 'bin/linux64')
-    else:
-        LingoLib = 'lingo'
-        LibPath = os.path.join(bd.LINGO_HOME, 'bin/linux32')
+    IncludePath = os.path.join(bd.LINGO64_HOME,'programming_samples')
+    LingoLib = 'lingo64'
+    LibPath = os.path.join(bd.LINGO64_HOME, 'bin/linux64')
 
     extra_link_args = '-Wl,-rpath-link,' + LibPath + ' -Wl,-rpath,' + LibPath
     macros = []

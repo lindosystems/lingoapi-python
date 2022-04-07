@@ -1,4 +1,4 @@
-from .const     import *
+from .const import *
 import os
 import sys
 import platform
@@ -25,12 +25,20 @@ class LingoError(lingoException):
     """ Exception rasied for errors thrown by the API
     Attributes:
     error: The error number returned by a Lingo API function
-    """
-
+    """ 
     def __init__(self, error):
         self.error = error
         self.message   = ErrorDict[error]
 
+class NoEviromentVar(lingoException):
+    """ Exception rasied when the proper enviroment variable is not set 
+        Attributes:
+        error: The error number returned by a Lingo API function
+    """
+    def __init__(self, error, dirName):
+        self.error   = error
+        self.dirName = dirName
+        self.message = "Environment variable {self.error} should be set to the {self.dirName}"
 
 
 class LoadException():
