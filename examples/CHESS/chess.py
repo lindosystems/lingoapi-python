@@ -54,7 +54,7 @@ STATUS     = -1
 NUT_COUNT   = len(SUPPLY)
 BRAND_COUNT = len(PRICE)
 
-brandNames = np.array(["Pawn", "Knight", "Bishopp", "King"])    
+brandNames = np.array(["Pawn", "Knight", "Bishop", "King"])    
 nutType    = np.array(["Peanut", "Cashew"])
 
 
