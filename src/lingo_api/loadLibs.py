@@ -39,16 +39,15 @@ def windows(bd:BuildData):
 # This function loads the libirc.so from the appropriate bin dir
 #
 def linux(bd:BuildData):
-
+    
     libircPath = os.path.join(bd.LINGO64_HOME,"bin/linux64/libirc.so")
     try:
-        if os.path.isfile(libircPath):
-            cdll.LoadLibrary(libircPath)
-        else:
-            raise LoadException
-    except LoadException as e:
-        print(e.errorMessage)
-        exit(1)
+        cdll.LoadLibrary(libircPath)
+    except Exception as e:
+        customException =  LoadException()
+        print(customException.errorMessage)
+        print("Python Error: ", e)
+        exit()
 
 
     
@@ -57,10 +56,10 @@ def main():
     #Environment variable LINDOAPI_HOME must be set
     if bd.LINGO_HOME == None and bd.is_64bits == False:
         raise NoEviromentVar("LINGO_19_HOME", "Lingo19")
-        exit(0)
+
     if bd.LINGO64_HOME == None and bd.is_64bits:
         raise NoEviromentVar("LINGO64_19_HOME", "Lingo64_19")
-        exit(0)
+
     if bd.platform == 'Windows' or bd.platform == "CYGWIN_NT-6.3":
         windows(bd)
     else:
