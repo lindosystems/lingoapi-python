@@ -1,7 +1,3 @@
-from pickle import NONE
-from time import process_time_ns
-from tkinter.messagebox import NO
-from traceback import print_tb
 from .const           import *
 from .lingoExceptions import *
 from .lingo           import *
