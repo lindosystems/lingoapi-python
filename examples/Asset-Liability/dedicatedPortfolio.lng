@@ -3,12 +3,11 @@ MODEL:
 !Purpose: Get number of bonds and liabilities;
 !before making the sets;
 CALC:
-NUM_BONDS       = @POINTER( 1);
-NUM_LIABILITIES = @POINTER( 2);
+NUM_LIABILITIES = @POINTER( 1);
 ENDCALC
 
 SETS:
-BONDS/1 .. NUM_BONDS/: AMOUNT, PRICE;
+BONDS: AMOUNT, PRICE;
 LIABILITIES/1 .. NUM_LIABILITIES/: L, SLACK, DUAL_PRICE;
 CASHFLOW(BONDS, LIABILITIES): F; 
 ENDSETS
@@ -16,7 +15,7 @@ ENDSETS
 ! First DATA section;
 ! Purpose: read in model data; 
 DATA:
-
+    BONDS = @POINTER( 2);
     PRICE = @POINTER( 3);
     L     = @POINTER( 4);
     F     = @POINTER( 5);

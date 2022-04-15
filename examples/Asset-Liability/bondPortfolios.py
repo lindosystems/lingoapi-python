@@ -56,6 +56,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+uData = {}
+def cbError(pEnv, uData, nErrorCode, errorText):
+    raise lingo.CallBackError(nErrorCode, errorText)
+
 # Compute the presentvalue of cashflow
 def PV(L,rf,t):
     PV = np.sum(L/(1+rf)**t, axis=0)
@@ -82,9 +86,9 @@ bondDf = pd.read_csv("bondData.csv")
 liabilitiesDf = pd.read_csv("liabilities.csv")
 
 # Prepare bond data
-bondNames   = bondDf.Bond_Name.values
+BONDS   = bondDf.Bond_Name.values 
 PRICE  = bondDf.Price.values
-NUM_BONDS = len(PRICE)
+NUM_BONDS = len(BONDS)
 bondDataStarts = 2
 CASH_FLOWS   = bondDf.iloc[:,bondDataStarts:].values
 timeLabel = bondDf.iloc[:,bondDataStarts:].columns
@@ -109,8 +113,8 @@ DUAL_PRICE = np.zeros(NUM_LIABILITIES)
 DEDICATE_STATUS  = -1
 IMMUNIZED_STATUS = -1
 
-dedicatedPointerDict = {"Pointer1":NUM_BONDS,
-                        "Pointer2":NUM_LIABILITIES,
+dedicatedPointerDict = {"Pointer1":NUM_LIABILITIES,
+                        "Pointer2":BONDS,
                         "Pointer3":PRICE,
                         "Pointer4":LIABILITIES,
                         "Pointer5":CASH_FLOWS,
@@ -119,7 +123,7 @@ dedicatedPointerDict = {"Pointer1":NUM_BONDS,
                         "Pointer8":DEDICATE_STATUS
 }
 
-immunizedPointerDict = {"Pointer1":NUM_BONDS,
+immunizedPointerDict = {"Pointer1":BONDS,
                         "Pointer2":PRICE,
                         "Pointer3":PV_B,
                         "Pointer4":DD_B,
@@ -133,6 +137,11 @@ immunizedPointerDict = {"Pointer1":NUM_BONDS,
 
 dedicatedModel = lingo.Model(lngDedicatedFile, dedicatedPointerDict, logDedicatedFile)
 immunizedModel = lingo.Model(lngImmunizedFile, immunizedPointerDict, logImmunizedFile)
+
+dedicatedModel.set_cbError(cbError)
+dedicatedModel.set_uData(uData)
+immunizedModel.set_cbError(cbError)
+immunizedModel.set_uData(uData)
 
 lingo.solve(dedicatedModel)
 lingo.solve(immunizedModel)
@@ -171,7 +180,7 @@ print(f"Bond               Dedicated Portfolio    Immunized Portfolio")
 print(f"                         Amount                Amount")
 print("================================================================")
 for i in range(0,NUM_BONDS):
-    print(f"{bondNames[i]:10} {DEDICATE_AMOUNT[i]:20.4F}  {IMMUNIZED_AMOUNT[i]:20.4F} ")
+    print(f"{BONDS[i]:10} {DEDICATE_AMOUNT[i]:20.4F}  {IMMUNIZED_AMOUNT[i]:20.4F} ")
 print("================================================================")
 print(f"{'Cost              ':10} {dedicated_cost:15.4f} {immunized_cost:15.4f}")
 print(f"{'Preaent Value     ':10} {dedicated_PV:15.4f} {immunized_PV:15.4f}")

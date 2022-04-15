@@ -1,0 +1,83 @@
+MODEL:
+! Uses Lingo's programming capability to do 
+  on-the-fly column generation for a 
+  cutting-stock problem;
+DATA:
+   NPATTERNS = @POINTER( 1);
+ENDDATA
+
+SETS:
+PATTERN/1 .. NPATTERNS/: COST, X;
+FG: WIDTH, DEM, PRICE, Y;
+FXP(FG, PATTERN): NBR;
+ENDSETS
+
+SUBMODEL MASTER:
+    MIN = @SUM(PATTERN( J): X( J)*COST( J));
+    @FOR(FG( I):
+        [R_DEM]
+        @SUM(PATTERN( J)| J #LE# NPATS: NBR(I,J)*X( J)) >= DEM( I)
+    );
+ENDSUBMODEL
+
+SUBMODEL INTEGER_REQ:
+    @FOR(PATTERN: @GIN( X));
+ENDSUBMODEL
+
+SUBMODEL PATTERN_GEN:
+    [SUBMOBJ] MAX = @SUM(FG( I): PRICE( I)*Y( I) );
+    @SUM( FG( I): WIDTH( I)*Y( I)) <= RMWIDTH;
+    @FOR( FG: @GIN(Y));
+ENDSUBMODEL
+
+DATA:
+    FG      = @POINTER( 2);
+    WIDTH   = @POINTER( 3);
+    DEM     = @POINTER( 4);
+    RMWIDTH = @POINTER( 5);
+ENDDATA
+
+CALC:
+    FINAL = -1;
+    BIGM    = 999;
+    ! SET COSTS;
+    COST( 1) = BIGM;
+    @FOR( PATTERN( J) | J #GT# 1: COST( J) = 1);
+    ! SUPER PATTERN;
+    @FOR( FG( I): NBR(I, 1) = 1);
+    ! Max number of patterns we'll allow;
+    MXPATS = @SIZE(PATTERN);
+
+    NPATS = 1;
+    RC = -BIGM;
+    @WHILE( RC #LT# 0 #AND# NPATS #LT# MXPATS:
+        ! Solve the LP of the master problem;
+        @SOLVE(MASTER);
+        ! Copy the Dual price;
+        @FOR( FG( I): PRICE( I) = -@DUAL(R_DEM(I)));
+        ! Generate the most attractive pattern;
+        @SOLVE( PATTERN_GEN);
+        ! Marginal Value of current best pattern;
+        RC = 1 - SUBMOBJ;
+         ! Add the pattern to the Master if it will help;
+        @IFC( RC #LT# 0:
+            NPATS = NPATS + 1;
+            @FOR( FG( I): NBR( I, NPATS) = Y( I));
+                COST( NPATS) = 1;
+            );
+    );
+    ! Set final to true for callback;
+    FINAL = 1;
+    ! Solve master problem as an Integer program;
+    @SOLVE(MASTER, INTEGER_REQ);
+
+ENDCALC
+
+DATA:
+    @POINTER( 6) = X;
+    @POINTER( 7) = NPATS;
+    @POINTER( 8) = NBR;
+    @POINTER( 9) = @STATUS();
+ENDDATA
+
+END

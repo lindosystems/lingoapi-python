@@ -29,7 +29,7 @@ Brand      Peanut       Cashew     Produce
 ==========================================
 Pawn         721.1538    48.0769   769.2308
 Knight         0.0000     0.0000     0.0000
-Bishopp        0.0000     0.0000     0.0000
+Bishop         0.0000     0.0000     0.0000
 King          28.8462   201.9231   230.7692
 ==========================================
 Totals          750.0      250.0     1000.0
@@ -39,9 +39,15 @@ Totals          750.0      250.0     1000.0
 import lingo_api as lingo
 import numpy as np
 
+
+uData = {}
+def cbError(pEnv, uData, nErrorCode, errorText):
+    raise lingo.CallBackError(nErrorCode, errorText)
+
 lngFile = "chess.lng"
 
-
+NUTS   = np.array(["Peanut","Cashew"])
+BRANDS = np.array(["Pawn", "Knight", "Bishop", "King"])   
 SUPPLY     =  np.array( [750, 250])          # Total supply of each type
 PRICE      =  np.array( [2,3,4,5])           # price that each brand charge
 FORMULA    =  np.array( [[15,10, 6, 2],                                                    
@@ -54,12 +60,12 @@ STATUS     = -1
 NUT_COUNT   = len(SUPPLY)
 BRAND_COUNT = len(PRICE)
 
-brandNames = np.array(["Pawn", "Knight", "Bishop", "King"])    
-nutType    = np.array(["Peanut", "Cashew"])
 
 
-pointerDict = {"Pointer1":NUT_COUNT,
-               "Pointer2":BRAND_COUNT, 
+
+
+pointerDict = {"Pointer1":NUTS,
+               "Pointer2":BRANDS, 
                "Pointer3":SUPPLY, 
                "Pointer4":PRICE, 
                "Pointer5":FORMULA,
@@ -69,6 +75,10 @@ pointerDict = {"Pointer1":NUT_COUNT,
 
 
 model = lingo.Model(lngFile , pointerDict,"log")
+
+model.set_cbError(cbError)
+model.set_uData(uData)
+
 lingo.solve(model)
 
 STATUS  = model.get_pointer("Pointer7")
@@ -90,6 +100,6 @@ print(f"==========================================")
 for i in range(0,BRAND_COUNT):
     peanuts = PRODUCE[i]*FORMULA[peanut_i,i]/16
     cashews = PRODUCE[i]*FORMULA[cashew_i,i]/16
-    print(f"{brandNames[i]:10} {peanuts:10.4f} {cashews:10.4f} {PRODUCE[i]:10.4f}")
+    print(f"{BRANDS[i]:10} {peanuts:10.4f} {cashews:10.4f} {PRODUCE[i]:10.4f}")
 print(f"==========================================")
 print(f"{'Totals':10} {totalPeanuts:10} {totalCashew:10} {totalProduced:10}")

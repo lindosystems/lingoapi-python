@@ -3,17 +3,17 @@ MODEL:
 !Purpose: Get number of bonds and liabilities;
 !before making the sets;
 CALC:
-NUM_BONDS = @POINTER( 1);
+
 ENDCALC
 
 SETS:
-BONDS/1 .. NUM_BONDS/: AMOUNT, PRICE, PV_B, DD_B, DC_B;
+BONDS: AMOUNT, PRICE, PV_B, DD_B, DC_B;
 ENDSETS
 
 ! First DATA section;
 ! Purpose: read in model data; 
 DATA:
-
+    BONDS = @POINTER( 1);
     PRICE = @POINTER( 2);
     PV_B  = @POINTER( 3);
     DD_B  = @POINTER( 4);

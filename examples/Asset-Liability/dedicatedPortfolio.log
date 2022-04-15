@@ -1,0 +1,239 @@
+  LINGO/WIN64 19.0.0.53 (17 Feb 2022)
+ 
+  LINDO API 13.0.4099.331 (Feb 15 2022 18:22:11)
+ 
+  Copyright (C) 2011-2022 LINDO Systems Inc. Licensed material,
+  all rights reserved. Copying except as authorized in license
+  agreement is prohibited.
+ 
+  License location: D:\LINGO64_19\lndlng19.lic
+  Config  location: D:\LINGO64_19\LINGO.CNF
+ 
+  jhaas@lindo.com
+ 
+  Licensed for educational use only.
+  Branch-and-bound solver enabled.
+  Nonlinear solver enabled.
+  Barrier solver enabled.
+  Global solver enabled.
+  Integer solver enabled.
+  Stochastic solver enabled.
+  Conic solver enabled.
+ 
+ 
+   Parameter        Old Value     New Value
+    ECHOIN             0             1
+ 
+:  TAKE dedicatedPortfolio.lng
+: MODEL:
+? !First CALC section;
+? !Purpose: Get number of bonds and liabilities;
+? !before making the sets;
+? CALC:
+? NUM_LIABILITIES = @POINTER( 1);
+? ENDCALC
+? SETS:
+? BONDS: AMOUNT, PRICE;
+? LIABILITIES/1 .. NUM_LIABILITIES/: L, SLACK, DUAL_PRICE;
+? CASHFLOW(BONDS, LIABILITIES): F;
+? ENDSETS
+? ! First DATA section;
+? ! Purpose: read in model data;
+? DATA:
+?     BONDS = @POINTER( 2);
+?     PRICE = @POINTER( 3);
+?     L     = @POINTER( 4);
+?     F     = @POINTER( 5);
+? ENDDATA
+? SUBMODEL DedicatedPortfolio:
+? MIN = @SUM(BONDS( J): PRICE( J)*AMOUNT( J));
+? [FIRST_LIABILITIE] @SUM(BONDS( J): F( J, 1)*AMOUNT( J))  - SLACK( 1) = L( 1);
+? @FOR(LIABILITIES( T)| T #GT# 1: [Tth_LIABILITIE]
+?         @SUM(BONDS( J): F( J, T)*AMOUNT( J)) + SLACK(T - 1) - SLACK( T) = L( T));
+? ENDSUBMODEL
+? !Second CALC section;
+? !Purpose: Call solve then fill in the dual prices;
+? CALC:
+?     @SOLVE(DedicatedPortfolio);
+?     DUAL_PRICE( 1) = - @DUAL( FIRST_LIABILITIE );
+?     @FOR(LIABILITIES( I)| I #GE# 2:
+?         DUAL_PRICE( I) = -@DUAL( Tth_LIABILITIE(I) );
+?     );
+? ENDCALC
+? !Second DATA section;
+? !Purpose: Write the variables and model status;
+? !to the pointers;
+? DATA:
+?     @POINTER( 6) = AMOUNT;
+?     @POINTER( 7) = DUAL_PRICE;
+?     @POINTER( 8) = @STATUS();
+? ENDDATA
+? END
+:  GO
+  Compiling model ...
+  Structural analysis, pass 1 ...
+  Scalarizing model ...
+  Generating nonzero matrix ...
+  Solving ...
+ 
+  LINGO/WIN64 19.0.53 (17 Feb 2022), LINDO API 13.0.4099.331
+ 
+  Licensee info: jhaas@lindo.com
+ 
+  Global optimal solution found.
+  Objective value:                              2754.284
+  Infeasibilities:                              0.000000
+  Total solver iterations:                            12
+  Elapsed runtime seconds:                          0.00
+ 
+  Model Class:                                        LP
+ 
+  Total variables:                     25
+  Nonlinear variables:                  0
+  Integer variables:                    0
+ 
+  Total constraints:                    7
+  Nonlinear constraints:                0
+ 
+  Total nonzeros:                      74
+  Nonlinear nonzeros:                   0
+ 
+ 
+ 
+                                Variable           Value        Reduced Cost
+                         NUM_LIABILITIES        6.000000            0.000000
+                          AMOUNT( BOND1)        0.000000           0.5161712E-01
+                          AMOUNT( BOND2)        0.000000           0.2419144E-01
+                          AMOUNT( BOND3)        11.11111            0.000000
+                          AMOUNT( BOND4)        0.000000           0.7126755E-02
+                          AMOUNT( BOND5)        6.645898            0.000000
+                          AMOUNT( BOND6)       0.6093380            0.000000
+                          AMOUNT( BOND7)        0.000000           0.2262563E-01
+                          AMOUNT( BOND8)        0.000000           0.6700337
+                          AMOUNT( BOND9)        6.119757            0.000000
+                         AMOUNT( BOND10)        0.000000            2.329966
+                         AMOUNT( BOND11)       0.1088703            0.000000
+                         AMOUNT( BOND12)        0.000000           0.5145455
+                         AMOUNT( BOND13)        3.108870            0.000000
+                           PRICE( BOND1)        109.0000            0.000000
+                           PRICE( BOND2)        94.80000            0.000000
+                           PRICE( BOND3)        99.50000            0.000000
+                           PRICE( BOND4)        93.10000            0.000000
+                           PRICE( BOND5)        97.20000            0.000000
+                           PRICE( BOND6)        96.30000            0.000000
+                           PRICE( BOND7)        92.90000            0.000000
+                           PRICE( BOND8)        110.0000            0.000000
+                           PRICE( BOND9)        104.0000            0.000000
+                          PRICE( BOND10)        101.0000            0.000000
+                          PRICE( BOND11)        107.0000            0.000000
+                          PRICE( BOND12)        102.0000            0.000000
+                          PRICE( BOND13)        95.20000            0.000000
+                                   L( 1)        500.0000            0.000000
+                                   L( 2)        200.0000            0.000000
+                                   L( 3)        800.0000            0.000000
+                                   L( 4)        200.0000            0.000000
+                                   L( 5)        800.0000            0.000000
+                                   L( 6)        1200.000            0.000000
+                               SLACK( 1)        0.000000           0.6581818E-01
+                               SLACK( 2)        0.000000           0.5938047E-01
+                               SLACK( 3)        0.000000           0.6915888E-01
+                               SLACK( 4)        0.000000           0.7314134E-01
+                               SLACK( 5)        0.000000           0.6743644E-01
+                               SLACK( 6)        0.000000           0.6170647
+                          DUAL_PRICE( 1)        0.000000            0.000000
+                          DUAL_PRICE( 2)        0.000000            0.000000
+                          DUAL_PRICE( 3)        0.000000            0.000000
+                          DUAL_PRICE( 4)        0.000000            0.000000
+                          DUAL_PRICE( 5)        0.000000            0.000000
+                          DUAL_PRICE( 6)        0.000000            0.000000
+                            F( BOND1, 1)        10.00000            0.000000
+                            F( BOND1, 2)        10.00000            0.000000
+                            F( BOND1, 3)        10.00000            0.000000
+                            F( BOND1, 4)        10.00000            0.000000
+                            F( BOND1, 5)        10.00000            0.000000
+                            F( BOND1, 6)        110.0000            0.000000
+                            F( BOND2, 1)        7.000000            0.000000
+                            F( BOND2, 2)        7.000000            0.000000
+                            F( BOND2, 3)        7.000000            0.000000
+                            F( BOND2, 4)        7.000000            0.000000
+                            F( BOND2, 5)        7.000000            0.000000
+                            F( BOND2, 6)        107.0000            0.000000
+                            F( BOND3, 1)        8.000000            0.000000
+                            F( BOND3, 2)        8.000000            0.000000
+                            F( BOND3, 3)        8.000000            0.000000
+                            F( BOND3, 4)        8.000000            0.000000
+                            F( BOND3, 5)        8.000000            0.000000
+                            F( BOND3, 6)        108.0000            0.000000
+                            F( BOND4, 1)        6.000000            0.000000
+                            F( BOND4, 2)        6.000000            0.000000
+                            F( BOND4, 3)        6.000000            0.000000
+                            F( BOND4, 4)        6.000000            0.000000
+                            F( BOND4, 5)        106.0000            0.000000
+                            F( BOND4, 6)        0.000000            0.000000
+                            F( BOND5, 1)        7.000000            0.000000
+                            F( BOND5, 2)        7.000000            0.000000
+                            F( BOND5, 3)        7.000000            0.000000
+                            F( BOND5, 4)        7.000000            0.000000
+                            F( BOND5, 5)        107.0000            0.000000
+                            F( BOND5, 6)        0.000000            0.000000
+                            F( BOND6, 1)        6.000000            0.000000
+                            F( BOND6, 2)        6.000000            0.000000
+                            F( BOND6, 3)        6.000000            0.000000
+                            F( BOND6, 4)        106.0000            0.000000
+                            F( BOND6, 5)        0.000000            0.000000
+                            F( BOND6, 6)        0.000000            0.000000
+                            F( BOND7, 1)        5.000000            0.000000
+                            F( BOND7, 2)        5.000000            0.000000
+                            F( BOND7, 3)        5.000000            0.000000
+                            F( BOND7, 4)        105.0000            0.000000
+                            F( BOND7, 5)        0.000000            0.000000
+                            F( BOND7, 6)        0.000000            0.000000
+                            F( BOND8, 1)        10.00000            0.000000
+                            F( BOND8, 2)        10.00000            0.000000
+                            F( BOND8, 3)        110.0000            0.000000
+                            F( BOND8, 4)        0.000000            0.000000
+                            F( BOND8, 5)        0.000000            0.000000
+                            F( BOND8, 6)        0.000000            0.000000
+                            F( BOND9, 1)        8.000000            0.000000
+                            F( BOND9, 2)        8.000000            0.000000
+                            F( BOND9, 3)        108.0000            0.000000
+                            F( BOND9, 4)        0.000000            0.000000
+                            F( BOND9, 5)        0.000000            0.000000
+                            F( BOND9, 6)        0.000000            0.000000
+                           F( BOND10, 1)        6.000000            0.000000
+                           F( BOND10, 2)        6.000000            0.000000
+                           F( BOND10, 3)        106.0000            0.000000
+                           F( BOND10, 4)        0.000000            0.000000
+                           F( BOND10, 5)        0.000000            0.000000
+                           F( BOND10, 6)        0.000000            0.000000
+                           F( BOND11, 1)        10.00000            0.000000
+                           F( BOND11, 2)        110.0000            0.000000
+                           F( BOND11, 3)        0.000000            0.000000
+                           F( BOND11, 4)        0.000000            0.000000
+                           F( BOND11, 5)        0.000000            0.000000
+                           F( BOND11, 6)        0.000000            0.000000
+                           F( BOND12, 1)        7.000000            0.000000
+                           F( BOND12, 2)        107.0000            0.000000
+                           F( BOND12, 3)        0.000000            0.000000
+                           F( BOND12, 4)        0.000000            0.000000
+                           F( BOND12, 5)        0.000000            0.000000
+                           F( BOND12, 6)        0.000000            0.000000
+                           F( BOND13, 1)        100.0000            0.000000
+                           F( BOND13, 2)        0.000000            0.000000
+                           F( BOND13, 3)        0.000000            0.000000
+                           F( BOND13, 4)        0.000000            0.000000
+                           F( BOND13, 5)        0.000000            0.000000
+                           F( BOND13, 6)        0.000000            0.000000
+ 
+                                     Row    Slack or Surplus      Dual Price
+                                       1        2754.284           -1.000000
+                        FIRST_LIABILITIE        0.000000          -0.9520000
+                      TTH_LIABILITIE( 2)        0.000000          -0.8861818
+                      TTH_LIABILITIE( 3)        0.000000          -0.8268013
+                      TTH_LIABILITIE( 4)        0.000000          -0.7576425
+                      TTH_LIABILITIE( 5)        0.000000          -0.6845011
+                      TTH_LIABILITIE( 6)        0.000000          -0.6170647
+ 
+  Running output operations ...
+ 
+:  QUIT
