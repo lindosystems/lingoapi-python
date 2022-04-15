@@ -1,3 +1,6 @@
+from email import message
+from msilib.schema import Class
+from queue import Empty
 from .const import *
 import os
 import sys
@@ -19,7 +22,7 @@ class TypeNotSupportedError(lingoException):
     """
     def __init__(self, error):
         self.error = error
-        self.message = "Unsupported type\nPreferred type: NumPy Array of np.double\nOther excepted: Int, floats, lists of Ints or floats"
+        self.message = "Unsupported type\nPreferred type: NumPy Array of numpy.double\nOther excepted: NumPy array of numbers, Int, floats"
                 
 class LingoError(lingoException):
     """ Exception rasied for errors thrown by the API
@@ -29,6 +32,22 @@ class LingoError(lingoException):
     def __init__(self, error):
         self.error = error
         self.message   = ErrorDict[error]
+
+class CallBackError(lingoException):
+    """ Exception rasied for errors returned by the callbackError function
+    Attributes:
+    error  : nErrorCode sent to the callback
+    message: errorText sent to the callback
+    """ 
+    def __init__(self, error, message):
+        self.error   = error
+        self.message = message
+
+class EmptyPointer(lingoException):
+
+    def __init__(self, key):
+        self.error = key
+        self.message = "is an empty pointer. Allocate memory needed"
 
 class NoEviromentVar(lingoException):
     """ Exception rasied when the proper enviroment variable is not set 

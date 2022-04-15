@@ -18,6 +18,10 @@ struct module_state {
 static struct module_state _state;
 #endif
 
+// static PyObject *callbackSolver = NULL;
+// static PyObject *callbackError = NULL;
+// static PyObject *uData = NULL;
+
 static PyObject * error_out(PyObject *m) 
 {
     struct module_state *st = GETSTATE(m);
@@ -35,6 +39,11 @@ PyObject *pyLSopenLogFileLng(PyObject *self, PyObject *args);
 PyObject *pyLSsetIntPointerLng(PyObject *self, PyObject *args);
 PyObject *pyLSsetDouPointerLng(PyObject *self, PyObject *args);
 PyObject *pyLSsetCharPointerLng(PyObject *self, PyObject *args);
+PyObject *pyLSsetCallbackSolverLng(PyObject *self, PyObject *args);
+PyObject *pyLSgetDouCallbackInfoLng(PyObject *self, PyObject *args);
+PyObject *pyLSgetIntCallbackInfoLng(PyObject *self, PyObject *args);
+PyObject *pyLSgetCallbackVarPrimalLng(PyObject *self, PyObject *args);
+PyObject *pyLSsetCallbackErrorLng(PyObject *self, PyObject *args);
 
 static PyMethodDef lingo_methods[] = 
 {
@@ -49,6 +58,11 @@ static PyMethodDef lingo_methods[] =
     {"pyLSsetIntPointerLng", pyLSsetIntPointerLng, METH_VARARGS},
     {"pyLSsetDouPointerLng", pyLSsetDouPointerLng, METH_VARARGS},
     {"pyLSsetCharPointerLng", pyLSsetCharPointerLng, METH_VARARGS},
+    {"pyLSsetCallbackSolverLng", pyLSsetCallbackSolverLng, METH_VARARGS},
+    {"pyLSgetDouCallbackInfoLng", pyLSgetDouCallbackInfoLng, METH_VARARGS},
+    {"pyLSgetIntCallbackInfoLng", pyLSgetIntCallbackInfoLng, METH_VARARGS},
+    {"pyLSgetCallbackVarPrimalLng", pyLSgetCallbackVarPrimalLng, METH_VARARGS},
+    {"pyLSsetCallbackErrorLng", pyLSsetCallbackErrorLng, METH_VARARGS},
 
     {NULL, NULL}
 };
@@ -165,6 +179,7 @@ PyObject *pyLScreateEnvLng(PyObject *self, PyObject *args)
     return PyNewObjPtr(pEnv);
 }
 
+
 PyObject *pyLScreateEnvLicenseLng(PyObject *self, PyObject *args)
 {
     pLSenvLINGO    pEnv = NULL;
@@ -201,6 +216,7 @@ PyObject *pyLScreateEnvLicenseLng(PyObject *self, PyObject *args)
     return PyNewObjPtr(pEnv);
 }
 
+
 PyObject *pyLSclearPointersLng(PyObject *self, PyObject *args)
 {
     pLSenvLINGO    pEnv = NULL;
@@ -220,6 +236,7 @@ PyObject *pyLSclearPointersLng(PyObject *self, PyObject *args)
 
     return Py_BuildValue("i",nErrLng); 
 }
+
 
 PyObject *pyLScloseLogFileLng(PyObject *self, PyObject *args)
 {
@@ -241,6 +258,7 @@ PyObject *pyLScloseLogFileLng(PyObject *self, PyObject *args)
     return Py_BuildValue("i",nErrLng); 
 }
 
+
 PyObject *pyLSdeleteEnvLng(PyObject *self, PyObject *args)
 {
     pLSenvLINGO    pEnv = NULL;
@@ -260,6 +278,7 @@ PyObject *pyLSdeleteEnvLng(PyObject *self, PyObject *args)
 
     return Py_BuildValue("i",nErrLng); 
 }
+
 
 PyObject *pyLSexecuteScriptLng(PyObject *self, PyObject *args)
 {
@@ -283,6 +302,7 @@ PyObject *pyLSexecuteScriptLng(PyObject *self, PyObject *args)
     return Py_BuildValue("i",nErrLng); 
 }
 
+
 PyObject *pyLSopenLogFileLng(PyObject *self, PyObject *args)
 {
     pLSenvLINGO    pEnv = NULL;
@@ -304,6 +324,7 @@ PyObject *pyLSopenLogFileLng(PyObject *self, PyObject *args)
 
     return Py_BuildValue("i",nErrLng); 
 }
+
 
 PyObject *pyLSsetIntPointerLng(PyObject *self, PyObject *args)
 {
@@ -337,6 +358,7 @@ PyObject *pyLSsetIntPointerLng(PyObject *self, PyObject *args)
     return Py_BuildValue("i",nErrLng); 
 }
 
+
 PyObject *pyLSsetDouPointerLng(PyObject *self, PyObject *args)
 {
     pLSenvLINGO    pEnv = NULL;
@@ -348,26 +370,26 @@ PyObject *pyLSsetDouPointerLng(PyObject *self, PyObject *args)
     PyArrayObject  *pyPointer = NULL, *pyPointersNow = NULL;
     PyObject       *pyEnv;
 
-    if (!PyArg_ParseTuple(args, "OO!O!", 
-                                 &pyEnv,
-                                 &PyArray_Type,&pyPointer,
-                                 &PyArray_Type,&pyPointersNow))
+    if (!PyArg_ParseTuple(args, "OO!O!",                              
+                                 &pyEnv,                              
+                                 &PyArray_Type,&pyPointer,            
+                                 &PyArray_Type,&pyPointersNow))      
     {
         return NULL;
     }
 
     CHECK_ENV;
-
     if(pyPointer && pyPointer->dimensions > 0)
-        pdPointer = (double *)PyArray_GetPtr(pyPointer,index);
+        pdPointer = (double *)PyArray_GetPtr(pyPointer,index);   
 
     if(pyPointersNow && pyPointersNow->dimensions > 0)
         pnPointersNow = (int *)PyArray_GetPtr(pyPointersNow,index);
 
-    nErrLng = LSsetPointerLng(pEnv, pdPointer, pnPointersNow);
+    nErrLng = LSsetPointerLng(pEnv, pdPointer, pnPointersNow); 
 
     return Py_BuildValue("i",nErrLng); 
 }
+
 
 PyObject *pyLSsetCharPointerLng(PyObject *self, PyObject *args)
 {
@@ -377,7 +399,7 @@ PyObject *pyLSsetCharPointerLng(PyObject *self, PyObject *args)
     int            *pnPointersNow = NULL;
     npy_intp       index[1] = {0};
 
-    PyArrayObject  *pyPointer = NULL, *pyPointersNow = NULL;
+    PyArrayObject *pyPointer = NULL, *pyPointersNow = NULL;
     PyObject       *pyEnv;
 
     if (!PyArg_ParseTuple(args, "OO!O!", 
@@ -400,3 +422,235 @@ PyObject *pyLSsetCharPointerLng(PyObject *self, PyObject *args)
 
     return Py_BuildValue("i",nErrLng); 
 }
+
+
+
+/* PyObjects for Callbacks*/
+static PyObject *cbpyEnv   = NULL;
+static PyObject *cbSolver  = NULL;
+static PyObject *cbError   = NULL;
+static PyObject *cbuData   = NULL;
+
+int CALLTYPE relayCallbackSolver(pLSenvLINGO pL, int nReserved, void *pUserData)
+{
+    int retvalue = 0;
+    PyObject *arglist = NULL;
+    PyObject *result = NULL;
+
+    {
+        // Build up the argument list...
+        arglist = Py_BuildValue("(OiO)", cbpyEnv, nReserved, cbuData);
+        // ...for calling the Python cb function
+        if (arglist)
+            result = PyEval_CallObject(cbSolver, arglist);
+    }
+    if (result && PyLong_Check(result)) 
+    {
+        retvalue = PyLong_AsLong(result);
+    }
+    {
+        Py_XDECREF(result);
+        Py_DECREF(arglist);
+    }
+    return retvalue;
+}
+
+
+PyObject *pyLSsetCallbackSolverLng(PyObject *self, PyObject *args)
+{
+    pLSenvLINGO     pEnv     = NULL;
+    LSlngErrorCode  nErrLng  = LSERR_NO_ERROR_LNG;
+    PyObject       *newCb    = NULL;
+    PyObject       *newUData = NULL;
+    PyObject       *pyEnv;
+
+
+    if (PyArg_ParseTuple(args, "OOO", &pyEnv, &newCb, &newUData))
+    {
+        if (!PyCallable_Check(newCb)) 
+        {
+            PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+            return NULL;
+        }
+
+            CHECK_ENV;
+
+            Py_XINCREF(newCb);     /* Add a reference to new callback */
+            Py_XDECREF(cbSolver);   /* Dispose of previous callback */
+            cbSolver = newCb;      /* Remember new callback */
+
+            Py_XINCREF(newUData);  
+            Py_XDECREF(cbuData);      
+            cbuData = newUData;       
+
+            Py_XINCREF(pyEnv);   
+            Py_XDECREF(cbpyEnv);      
+            cbpyEnv = pyEnv;      
+
+        nErrLng = LSsetCallbackSolverLng(pEnv, relayCallbackSolver, NULL);
+        }
+
+    return Py_BuildValue("i",nErrLng); 
+}
+
+void CALLTYPE relayCallbackError(pLSenvLINGO pL, void* pUserData, int nErrorCode, char* pcErrorText)
+{
+    PyObject *arglist = NULL;
+    PyObject *result = NULL;
+
+    {
+        // Build up the argument list...
+        arglist = Py_BuildValue("(OOis)", cbpyEnv, cbuData, nErrorCode, pcErrorText);
+        // ...for calling the Python cb function
+        if (arglist)
+            result = PyEval_CallObject(cbError, arglist);
+    }
+
+    {
+        Py_XDECREF(result);
+        Py_DECREF(arglist);
+    }
+}
+
+PyObject *pyLSsetCallbackErrorLng(PyObject *self, PyObject *args)
+{
+
+    pLSenvLINGO     pEnv     = NULL;
+    LSlngErrorCode  nErrLng  = LSERR_NO_ERROR_LNG;
+    PyObject       *newCbError    = NULL;
+    PyObject       *newUData = NULL;
+    PyObject       *pyEnv;
+
+
+    if (PyArg_ParseTuple(args, "OOO", &pyEnv, &newCbError, &newUData))
+    {
+        if (!PyCallable_Check(&newCbError)) 
+        {
+            PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+            return NULL;
+        }
+            CHECK_ENV;
+
+
+            Py_XINCREF(newCbError);     /* Add a reference to new callback */
+            Py_XDECREF(cbError);        /* Dispose of previous callback    */
+            cbError = newCbError;       /* Remember new callback           */
+
+            Py_XINCREF(newUData);  
+            Py_XDECREF(cbuData);      
+            cbuData = newUData;       
+
+            Py_XINCREF(pyEnv);   
+            Py_XDECREF(cbpyEnv);      
+            cbpyEnv = pyEnv;      
+
+        nErrLng = LSsetCallbackErrorLng(pEnv, relayCallbackError, NULL);
+
+        }
+
+    return Py_BuildValue("i",nErrLng); 
+
+}
+
+
+PyObject *pyLSgetDouCallbackInfoLng(PyObject *self, PyObject *args)
+{
+    pLSenvLINGO     pEnv     = NULL;
+    LSlngErrorCode  nErrLng  = LSERR_NO_ERROR_LNG;
+    int             nObject;
+    PyArrayObject  *pyResults = NULL;
+    void         *pdResults = NULL;
+    npy_intp        index[1] = {0};
+    PyObject     *pyEnv;
+
+
+    if (!PyArg_ParseTuple(args, "OiO!", 
+                                 &pyEnv,
+                                 &nObject,
+                                 &PyArray_Type,&pyResults))
+    {
+        return NULL;
+    }
+
+    CHECK_ENV;
+
+    if(pyResults && pyResults->dimensions > 0)
+        pdResults = (void *)PyArray_GetPtr(pyResults,index);   
+
+     nErrLng = LSgetCallbackInfoLng(pEnv, nObject, pdResults);
+
+
+    return Py_BuildValue("i",nErrLng);
+}
+
+
+PyObject *pyLSgetIntCallbackInfoLng(PyObject *self, PyObject *args)
+{
+    pLSenvLINGO     pEnv      = NULL;
+    LSlngErrorCode  nErrLng   = LSERR_NO_ERROR_LNG;
+    int             nObject;
+    PyArrayObject  *pyResults = NULL;
+    void            *piResults = NULL;
+    npy_intp        index[1]  = {0};
+    PyObject       *pyEnv;
+
+
+    if (!PyArg_ParseTuple(args, "OiO!", 
+                                 &pyEnv,
+                                 &nObject,
+                                 &PyArray_Type,&pyResults))
+    {
+        return NULL;
+    }
+
+    CHECK_ENV;
+
+    if(pyResults && pyResults->dimensions > 0)
+        piResults = (void *)PyArray_GetPtr(pyResults,index);   
+
+     nErrLng = LSgetCallbackInfoLng(pEnv, nObject, piResults);
+
+
+    return Py_BuildValue("i",nErrLng);
+}
+
+
+// LSgetCallbackVarPrimalLng( pLSenvLINGO pL, const char* pcVarName, 
+//  double* pdPrimal);
+
+ PyObject *pyLSgetCallbackVarPrimalLng(PyObject *self, PyObject *args)
+ {
+    pLSenvLINGO     pEnv      = NULL;
+    LSlngErrorCode  nErrLng   = LSERR_NO_ERROR_LNG;
+    char           *paPointer = NULL;
+    double         *pdPointer = NULL;
+    npy_intp        index[1]  = {0};
+
+    PyArrayObject *pyCharPointer = NULL;
+    PyArrayObject *pyDouPointer  = NULL;
+    PyObject       *pyEnv;
+
+    if (!PyArg_ParseTuple(args, "OO!O!", 
+                                 &pyEnv,
+                                 &PyArray_Type,&pyCharPointer,
+                                 &PyArray_Type,&pyDouPointer))
+    {
+        return NULL;
+    }
+
+    CHECK_ENV;
+
+    if(pyCharPointer && pyCharPointer->dimensions > 0)
+        paPointer = (char *)PyArray_GetPtr(pyCharPointer,index);   
+
+    if(pyDouPointer && pyDouPointer->dimensions > 0)
+        pdPointer = (double *)PyArray_GetPtr(pyDouPointer,index);   
+
+
+     nErrLng = LSgetCallbackVarPrimalLng(pEnv, paPointer, pdPointer);
+
+     return Py_BuildValue("i",nErrLng);
+ }
+
+
+
