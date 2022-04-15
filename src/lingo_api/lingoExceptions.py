@@ -1,6 +1,3 @@
-from email import message
-from msilib.schema import Class
-from queue import Empty
 from .const import *
 import os
 import sys
