@@ -148,7 +148,7 @@ def solve(lm:Model):
             lm.set_pointer(key, pointer) # try without this line too...
 
         # Fix string arrays
-        if isinstance(pointer[0], np.character):
+        if isinstance(pointer[0], np.character) or type(pointer[0]) == str:
             tempPointerStr = ""
             tempPointerArr = np.array([""], dtype='S1024')
             for i in range(0,len(pointer)):
