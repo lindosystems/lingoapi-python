@@ -18,9 +18,7 @@ struct module_state {
 static struct module_state _state;
 #endif
 
-// static PyObject *callbackSolver = NULL;
-// static PyObject *callbackError = NULL;
-// static PyObject *uData = NULL;
+
 
 static PyObject * error_out(PyObject *m) 
 {
@@ -66,6 +64,13 @@ static PyMethodDef lingo_methods[] =
 
     {NULL, NULL}
 };
+
+
+/* PyObjects for Callbacks*/
+static PyObject *cbpyEnv   = NULL;
+static PyObject *cbSolver  = NULL;
+static PyObject *cbError   = NULL;
+static PyObject *cbuData   = NULL;
 
 #if PY_MAJOR_VERSION >= 3
 
@@ -425,11 +430,6 @@ PyObject *pyLSsetCharPointerLng(PyObject *self, PyObject *args)
 
 
 
-/* PyObjects for Callbacks*/
-static PyObject *cbpyEnv   = NULL;
-static PyObject *cbSolver  = NULL;
-static PyObject *cbError   = NULL;
-static PyObject *cbuData   = NULL;
 
 int CALLTYPE relayCallbackSolver(pLSenvLINGO pL, int nReserved, void *pUserData)
 {
@@ -493,7 +493,7 @@ PyObject *pyLSsetCallbackSolverLng(PyObject *self, PyObject *args)
     return Py_BuildValue("i",nErrLng); 
 }
 
-void CALLTYPE relayCallbackError(pLSenvLINGO pL, void* pUserData, int nErrorCode, char* pcErrorText)
+void CALLTYPE relayCallbackError(pLSenvLINGO pL, void *pUserData, int nErrorCode, char *pcErrorText)
 {
     PyObject *arglist = NULL;
     PyObject *result = NULL;
@@ -524,7 +524,7 @@ PyObject *pyLSsetCallbackErrorLng(PyObject *self, PyObject *args)
 
     if (PyArg_ParseTuple(args, "OOO", &pyEnv, &newCbError, &newUData))
     {
-        if (!PyCallable_Check(&newCbError)) 
+        if (!PyCallable_Check(newCbError)) 
         {
             PyErr_SetString(PyExc_TypeError, "parameter must be callable");
             return NULL;

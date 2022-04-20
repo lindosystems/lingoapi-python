@@ -20,7 +20,7 @@ class TypeNotSupportedError(lingoException):
     def __init__(self, error):
         self.error = error
         self.message = "Unsupported type\nPreferred type: NumPy Array of numpy.double\nOther excepted: NumPy array of numbers, Int, floats"
-                
+        super().__init__(self.error, self.message)  
 class LingoError(lingoException):
     """ Exception rasied for errors thrown by the API
     Attributes:
@@ -29,6 +29,7 @@ class LingoError(lingoException):
     def __init__(self, error):
         self.error = error
         self.message   = ErrorDict[error]
+        super().__init__(self.error, self.message)
 
 class CallBackError(lingoException):
     """ Exception rasied for errors returned by the callbackError function
@@ -39,12 +40,14 @@ class CallBackError(lingoException):
     def __init__(self, error, message):
         self.error   = error
         self.message = message
+        super().__init__(self.error, self.message)
 
 class EmptyPointer(lingoException):
 
     def __init__(self, key):
         self.error = key
         self.message = "is an empty pointer. Allocate memory needed"
+        super().__init__(self.error, self.message)
 
 class NoEviromentVar(lingoException):
     """ Exception rasied when the proper enviroment variable is not set 
@@ -55,6 +58,7 @@ class NoEviromentVar(lingoException):
         self.error   = error
         self.dirName = dirName
         self.message = f"Environment variable {self.error} should be set to the {self.dirName}"
+        super().__init__(self.error, self.message)
 
 
 class LoadException():

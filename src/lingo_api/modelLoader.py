@@ -3,8 +3,6 @@ from .lingoExceptions import *
 from .lingo           import *
 import numpy as np
 
-
-
 class Model():
 
     def __init__(self, lngFile, pointerDict, logFile=None,
@@ -71,11 +69,11 @@ class Model():
         self.cbSolver = cbSolver
 
     def set_cbError(self,cbError):
-        """get_cbError sets error callback"""
+        """set_cbError sets error callback"""
         self.cbError = cbError
 
     def set_uData(self,uData):
-        """get_uData sets uData dictionary"""
+        """set_uData sets uData dictionary"""
         self.uData = uData
 
 
@@ -104,25 +102,23 @@ def solve(lm:Model):
             raise LingoError(errorcode)
 
     # set callbacks if passed
+    if lm.cbSolver != None and lm.uData != None:
+        errorcode = pyLSsetCallbackSolverLng(pEnv, lm.cbSolver, lm.uData)
+        if errorcode != LSERR_NO_ERROR_LNG:
+                raise LingoError(errorcode)
+
     if lm.cbError != None and lm.uData != None:
         errorcode = pyLSsetCallbackErrorLng(pEnv, lm.cbError, lm.uData)
         if errorcode != LSERR_NO_ERROR_LNG:
             raise LingoError(errorcode)
-    if lm.cbSolver != None and lm.uData != None:
-        errorcode = pyLSsetCallbackSolverLng(pEnv, lm.cbSolver, lm.uData)
-        if errorcode != LSERR_NO_ERROR_LNG:
-            raise LingoError(errorcode)
 
 
-    
-    
 
-        
+
     # pass memory transfer pointers to LINGO
     pnPointersNow = np.array([0],dtype=np.int32)
     # Loop over dict
 
-        
     for key, pointer in lm.pointerDict.items():
         
         # except arrays and singletons

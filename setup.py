@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "19.0.4"
+VERSION = "19.0.5"
 
 class BuildData():
     """
@@ -84,8 +84,8 @@ setup_kwargs = {"name" : 'lingo-api',
                 "version" : VERSION,
                 "description" : 'Python interface to LINGO API',
                 "long_description": long_description,
-                "author" : 'Zhe Liu',
-                "author_email" : 'kevin@lindo.com',
+                "author" : 'Lindo Systems, Inc.',
+                "author_email" : 'support@lindo.com',
                 "url" : 'http://www.lindo.com',
                 "classifiers": [
                 "Programming Language :: Python :: 3",

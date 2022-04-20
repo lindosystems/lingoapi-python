@@ -33,6 +33,11 @@ def windows(bd:BuildData):
             os.add_dll_directory(bd.LINGO64_HOME)
         else:
             os.add_dll_directory(bd.LINGO_HOME)
+    else:
+        if bd.is_64bits:
+            os.environ['PATH'] = bd.LINGO64_HOME + os.pathsep + os.environ['PATH']
+        else:
+            os.environ['PATH'] = bd.LINGO_HOME + os.pathsep + os.environ['PATH']
 
 #
 # linux()
