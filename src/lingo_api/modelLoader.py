@@ -140,12 +140,14 @@ def solve(lm:Model):
             lm.set_pointer(key, pointer) # try without this line too...
 
         # Fix string arrays
+        # type(pointer[0]) == np.bytes_
         if isinstance(pointer[0], np.character) or type(pointer[0]) == str:
-            tempPointerStr = ""
-            tempPointerArr = np.array([""], dtype='S1024')
+            tempPointerArrstr = ""
             for i in range(0,len(pointer)):
-                tempPointerStr+=f"{pointer[i]} \n "
-            tempPointerArr[0] = tempPointerStr
+                tempPointerArrstr+=f"{pointer[i]}\n"
+            tempPointerArr = np.array([tempPointerArrstr])
+            byteSize = 2*len(tempPointerArr[0]) #<- doubling the len to determin the byte size for the np array
+            tempPointerArr = tempPointerArr.astype(f"|S{byteSize}")
             errorcode = pyLSsetCharPointerLng(pEnv, tempPointerArr, pnPointersNow)
             if errorcode != LSERR_NO_ERROR_LNG:
                 raise LingoError(errorcode)
