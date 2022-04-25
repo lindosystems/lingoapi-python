@@ -9,13 +9,13 @@ This python package can be installed with pip. It is assumed 64-bit Lingo 19 is 
 For administrative users: 
 
 ```bash
-> pip install lingo_api==19.0
+> pip install lingo_api
 ```
 
 For standard (non-administrative) users:
 
 ```bash
-> pip install lingo_api==19.0 --user
+> pip install lingo_api --user
 ```
 
 ## Testing
