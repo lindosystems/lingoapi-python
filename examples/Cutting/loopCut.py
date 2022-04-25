@@ -72,7 +72,7 @@ def cbSolver(pEnv, nReserved, uData):
 
 def cbError(pEnv, uData, nErrorCode, errorText):
     # A exception will be displayed if this callback is called
-    raise lingo.CallBackError(nErrorCode, errorText)
+    raise(nErrorCode, errorText)
 
 
 lngFile = "loopCut.lng"
@@ -91,25 +91,29 @@ NPATS = np.array([-1.0])
 NBR = np.zeros(NFG*NPATTERNS)
 STATUS = np.array([-1.0])
 
-pointerDict = {"Pointer1":NPATTERNS,
-               "Pointer2":FG, 
-               "Pointer3":WIDTH, 
-               "Pointer4":DEM, 
-               "Pointer5":RMWIDTH,
-               "Pointer6":X,
-               "Pointer7":NPATS,
-               "Pointer8":NBR,
-               "Pointer9":STATUS
-               }
+# Create a model object
+model = lingo.Model(lngFile)
 
-model = lingo.Model(lngFile , pointerDict, "log")
+# set all pointers in the order that they appear in loopCut.lng
+model.set_pointer("Pointer1",NPATTERNS,lingo.PARAM)
+model.set_pointer("Pointer2",FG,lingo.SET)
+model.set_pointer("Pointer3",WIDTH,lingo.PARAM)
+model.set_pointer("Pointer4",DEM,lingo.PARAM)
+model.set_pointer("Pointer5",RMWIDTH,lingo.PARAM)
+model.set_pointer("Pointer6",X,lingo.VAR)
+model.set_pointer("Pointer7",NPATS,lingo.VAR)
+model.set_pointer("Pointer8",NBR,lingo.VAR)
+model.set_pointer("Pointer9",STATUS,lingo.VAR)
 
+# set all both callback functions and user data
 model.set_cbSolver(cbSolver)
 model.set_cbError(cbError)
 model.set_uData(uData)
 
+# solve the model
 lingo.solve(model)
 
+# Check if optimal
 if STATUS[0] == lingo.LS_STATUS_GLOBAL_LNG:
     print("\nGlobal optimum found!")
 elif STATUS[0] == lingo.LS_STATUS_LOCAL_LNG:

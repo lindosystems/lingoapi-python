@@ -1,0 +1,44 @@
+MODEL:
+
+DATA:
+	NODECOUNT = @POINTER( 1);
+ENDDATA
+
+SETS:
+
+NODES /1 .. NODECOUNT/;
+ARCS(NODES,NODES): X, DIST, TIME;
+
+ENDSETS
+
+DATA:
+!Attach Data to sets;
+ARCS    = @POINTER( 2);
+DIST    = @POINTER( 3);
+SOURCE  = @POINTER( 4); 
+SINK    = @POINTER( 5); 
+ENDDATA
+
+!;
+	!Minimize distance traveled along the network;
+	Min = @SUM(ARCS(I,J): (DIST(I,J)*X(I,J)));
+	!Total flow from source is 1;
+	@SUM(ARCS(I,J)| I #EQ# SOURCE: X(I,J)) = 1;
+	!Total flow into the sink is 1;
+	@SUM(ARCS(I,J)| J #EQ# SINK: X(I,J)) = 1;
+	!Conservation of Flow;
+	@FOR(NODES(K): 
+   	 	@SUM(ARCS(I,J)| I #EQ# K #AND# I #NE# SOURCE #AND# I #NE# SINK: X(I,J))
+ 	   - @SUM(ARCS(J,I)| I #EQ# K #AND# I #NE# SOURCE #AND# I #NE# SINK: X(J,I)) = 0
+	);
+
+
+
+DATA:
+
+	@POINTER( 6) = X;
+	@POINTER( 7) = @STATUS();
+
+ENDDATA
+
+END

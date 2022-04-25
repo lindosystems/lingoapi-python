@@ -105,59 +105,54 @@ PV_B = np.array([PV(CASH_FLOWS[i], riskFree, t) for i in range(0,NUM_BONDS)])
 DD_B = np.array([DD(CASH_FLOWS[i], riskFree, t) for i in range(0,NUM_BONDS)])
 DC_B = np.array([DC(CASH_FLOWS[i], riskFree, t) for i in range(0,NUM_BONDS)])
 
-
+# Allocate the variable data
 DEDICATE_AMOUNT = np.zeros(NUM_BONDS)
 IMMUNIZED_AMOUNT = np.zeros(NUM_BONDS)
 DUAL_PRICE = np.zeros(NUM_LIABILITIES)
 
+# for checking if the model is optimal 
 DEDICATE_STATUS  = -1
 IMMUNIZED_STATUS = -1
 
-dedicatedPointerDict = {"Pointer1":NUM_LIABILITIES,
-                        "Pointer2":BONDS,
-                        "Pointer3":PRICE,
-                        "Pointer4":LIABILITIES,
-                        "Pointer5":CASH_FLOWS,
-                        "Pointer6":DEDICATE_AMOUNT,
-                        "Pointer7":DUAL_PRICE,
-                        "Pointer8":DEDICATE_STATUS
-}
+# Create two different models for each type of portfolio
+dedicatedModel = lingo.Model(lngDedicatedFile, logDedicatedFile)
+immunizedModel = lingo.Model(lngImmunizedFile, logImmunizedFile)
 
-immunizedPointerDict = {"Pointer1":BONDS,
-                        "Pointer2":PRICE,
-                        "Pointer3":PV_B,
-                        "Pointer4":DD_B,
-                        "Pointer5":DC_B,
-                        "Pointer6":PV_L,
-                        "Pointer7":DD_L,
-                        "Pointer8":DC_L,
-                        "Pointer9":IMMUNIZED_AMOUNT,
-                        "Pointer10":IMMUNIZED_STATUS
-}
+# set all pointers in the order that they appear in dedicatedPortfolio.lng
+dedicatedModel.set_pointer("Pointer1",NUM_LIABILITIES,lingo.PARAM)
+dedicatedModel.set_pointer("Pointer2",BONDS,lingo.SET)
+dedicatedModel.set_pointer("Pointer3",PRICE,lingo.PARAM)
+dedicatedModel.set_pointer("Pointer4",LIABILITIES,lingo.PARAM)
+dedicatedModel.set_pointer("Pointer5",CASH_FLOWS,lingo.PARAM)
+dedicatedModel.set_pointer("Pointer6",DEDICATE_AMOUNT,lingo.VAR)
+dedicatedModel.set_pointer("Pointer7",DUAL_PRICE,lingo.VAR)
+dedicatedModel.set_pointer("Pointer8",DEDICATE_STATUS,lingo.VAR)
 
-dedicatedModel = lingo.Model(lngDedicatedFile, dedicatedPointerDict, logDedicatedFile)
-immunizedModel = lingo.Model(lngImmunizedFile, immunizedPointerDict, logImmunizedFile)
+# set all pointers in the order that they appear in immunized.lng
+immunizedModel.set_pointer("Pointer1",BONDS,lingo.SET)
+immunizedModel.set_pointer("Pointer2",PRICE,lingo.PARAM)
+immunizedModel.set_pointer("Pointer3",PV_B,lingo.PARAM)
+immunizedModel.set_pointer("Pointer4",DD_B,lingo.PARAM)
+immunizedModel.set_pointer("Pointer5",DC_B,lingo.PARAM)
+immunizedModel.set_pointer("Pointer6",PV_L,lingo.PARAM)
+immunizedModel.set_pointer("Pointer7",DD_L,lingo.PARAM)
+immunizedModel.set_pointer("Pointer8",DC_L,lingo.PARAM)
+immunizedModel.set_pointer("Pointer9",IMMUNIZED_AMOUNT,lingo.VAR)
+immunizedModel.set_pointer("Pointer10",IMMUNIZED_STATUS,lingo.VAR)
 
+# Set callbacks for both models
 dedicatedModel.set_cbError(cbError)
 dedicatedModel.set_uData(uData)
 immunizedModel.set_cbError(cbError)
 immunizedModel.set_uData(uData)
 
+# solve both models
 lingo.solve(dedicatedModel)
 lingo.solve(immunizedModel)
 
-
-dedicated_cost = np.sum(DEDICATE_AMOUNT*PRICE)
-dedicated_PV   = np.sum(DEDICATE_AMOUNT*PV_B)
-dedicated_DD   = np.sum(DEDICATE_AMOUNT*DD_B)
-dedicated_DC   = np.sum(DEDICATE_AMOUNT*DC_B)
-
-
-immunized_cost = np.sum(IMMUNIZED_AMOUNT*PRICE)
-immunized_PV   = np.sum(IMMUNIZED_AMOUNT*PV_B)
-immunized_DD   = np.sum(IMMUNIZED_AMOUNT*DD_B)
-immunized_DC   = np.sum(IMMUNIZED_AMOUNT*DC_B)
-
+# Check the status of both models
+# since both are not numpy arrays they need to be fetched 
+# from the model object
 DEDICATE_STATUS = dedicatedModel.get_pointer("Pointer8")
 IMMUNIZED_STATUS = immunizedModel.get_pointer("Pointer10")
 
@@ -175,7 +170,19 @@ elif IMMUNIZED_STATUS == lingo.LS_STATUS_LOCAL_LNG:
 else:
     print("Immunized portfolio: Solution is non-optimal")
 
+# compute the Present value, Duration and Convexity of 
+# each portfolio.
+dedicated_cost = np.sum(DEDICATE_AMOUNT*PRICE)
+dedicated_PV   = np.sum(DEDICATE_AMOUNT*PV_B)
+dedicated_DD   = np.sum(DEDICATE_AMOUNT*DD_B)
+dedicated_DC   = np.sum(DEDICATE_AMOUNT*DC_B)
 
+immunized_cost = np.sum(IMMUNIZED_AMOUNT*PRICE)
+immunized_PV   = np.sum(IMMUNIZED_AMOUNT*PV_B)
+immunized_DD   = np.sum(IMMUNIZED_AMOUNT*DD_B)
+immunized_DC   = np.sum(IMMUNIZED_AMOUNT*DC_B)
+
+# print out the results. 
 print(f"Bond               Dedicated Portfolio    Immunized Portfolio")
 print(f"                         Amount                Amount")
 print("================================================================")
@@ -188,7 +195,7 @@ print(f"{'Dollar Duration   ':10} {dedicated_DD:15.4f} {immunized_DD:15.4f}")
 print(f"{'Duration Convexity':10} {dedicated_DC:15.4f} {immunized_DC:15.4f}")
 
 
-
+# build yeild curve plot.
 spotRate = np.fromiter( (1/DUAL_PRICE[i]**(1/(i+1)) - 1 for i in range(0,len(DUAL_PRICE))), dtype=np.double)
 
 plt.plot(timeLabel, spotRate)
