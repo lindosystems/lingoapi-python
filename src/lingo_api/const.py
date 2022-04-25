@@ -46,3 +46,8 @@ LS_STATUS_LOCAL_LNG                 = 6
 LS_STATUS_LOCAL_INFEASIBLE_LNG      = 7
 LS_STATUS_CUTOFF_LNG                = 8
 LS_STATUS_NUMERIC_ERROR_LNG         = 9
+
+
+SET      = 0
+PARAM    = 1
+VAR      = 2

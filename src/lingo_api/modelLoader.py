@@ -5,17 +5,17 @@ import numpy as np
 
 class Model():
 
-    def __init__(self, lngFile, pointerDict, logFile=None,
+    def __init__(self, lngFile, logFile="TempModel.log",
                  cbSolver=None, cbError=None,
                  uData=None):
 
         self.lngFile     = lngFile
-        self.pointerDict = pointerDict
         self.logFile     = logFile
         self.cbSolver    = cbSolver
         self.cbError     = cbError
         self.uData       = uData
 
+        self._pointerDict = {}
         self._changedDict = {}
 
     def get_lngFile(self):
@@ -24,17 +24,17 @@ class Model():
 
     def get_pointerDict(self):
         """get_pointerDict returns pointerDict"""
-        return self.pointerDict
+        return self._pointerDict
 
     def get_logFile(self):
         """get_logFile returns logFile"""
         return self.logFile
 
-    def get_pointer(self, key):
+    def get_pointer(self, ptrName):
         """get_pointer returns the poiner from key in pointerDict
             Arguments: 
                 key -- a key in the pointerDict """
-        return self.pointerDict[key]
+        return self._pointerDict[ptrName]
 
     def get_cbSolver(self):
         """get_cbSolver returns the solver callback"""
@@ -52,17 +52,13 @@ class Model():
         """set_lngFile sets the lngFile"""
         self.lngFile = lngFile
 
-    def set_pointerDict(self,pointerDict):
-        """set_pointerDict sets the pointerDict"""
-        self.pointerDict = pointerDict
-
     def set_logFile(self,logFile):
         """set_logFile sets the logFile"""
         self.logFile = logFile
 
-    def set_pointer(self,key,pointer):
+    def set_pointer(self,key,pointer, type):
         """set_pointer """
-        self.pointerDict[key] = pointer
+        self._pointerDict[key] = (pointer, type)
 
     def set_cbSolver(self,cbSolver):
         """set_cbSolver sets the solver callback"""
@@ -119,13 +115,19 @@ def solve(lm:Model):
     pnPointersNow = np.array([0],dtype=np.int32)
     # Loop over dict
 
-    for key, pointer in lm.pointerDict.items():
+    for key, tuple in lm._pointerDict.items():
         
+
+        pointer = tuple[0]
+        ptrType = tuple[1]
+
+
+        # set Param and Vars as np.double
         # except arrays and singletons
-        if type(pointer)==int or type(pointer)==float  or isinstance(pointer, np.number):
-            lm._changedDict[key] = type(pointer)
+        if type( pointer)==int or type( pointer)==float  or isinstance(pointer, np.number):
+            lm._changedDict[key] = type( pointer)
             pointer = np.array([pointer], dtype=np.double)
-            lm.set_pointer(key, pointer)
+            lm.set_pointer(key, pointer, ptrType)
         # After this point everything should be a np array
         if type(pointer) != np.ndarray:
                 error = f"{key} {pointer} type: {type(pointer)}"
@@ -137,28 +139,31 @@ def solve(lm:Model):
         # Make sure all Arrays are flat
         if pointer.ndim > 1:
             pointer = pointer.flatten()
-            lm.set_pointer(key, pointer) # try without this line too...
+            lm.set_pointer(key, pointer, ptrType) # try without this line too...
 
-        # Fix string arrays
-        # type(pointer[0]) == np.bytes_
-        if isinstance(pointer[0], np.character) or type(pointer[0]) == str:
+        # set Sets as "|S" type
+        if ptrType == SET:
             tempPointerArrstr = ""
             for i in range(0,len(pointer)):
-                tempPointerArrstr+=f"{pointer[i]}\n"
+                tempPointerArrstr+=f"{str(pointer[i])}\n"
             tempPointerArr = np.array([tempPointerArrstr])
             byteSize = 2*len(tempPointerArr[0]) #<- doubling the len to determin the byte size for the np array
             tempPointerArr = tempPointerArr.astype(f"|S{byteSize}")
             errorcode = pyLSsetCharPointerLng(pEnv, tempPointerArr, pnPointersNow)
             if errorcode != LSERR_NO_ERROR_LNG:
                 raise LingoError(errorcode)
-        else:
+
+        elif ptrType == PARAM or ptrType == VAR:
             if pointer.dtype!=np.double:
                 lm._changedDict[key] = pointer.dtype
                 pointer = pointer.astype(np.double)
-                lm.set_pointer(key, pointer)
+                lm.set_pointer(key, pointer, ptrType)
             errorcode = pyLSsetDouPointerLng(pEnv, pointer, pnPointersNow)
             if errorcode != LSERR_NO_ERROR_LNG:
                 raise LingoError(errorcode)
+        else:
+            raise PointerTypeNotSupportedError(ptrType)
+          
 
     #Run the script
     cScript = "SET ECHOIN 1 \n TAKE "+lm.lngFile+" \n GO \n QUIT \n"
@@ -183,13 +188,13 @@ def solve(lm:Model):
 
 def _resetChanges(lm:Model):
     for key, t in lm._changedDict.items():
-        pointer = lm.get_pointer(key)
+        pointer, ptrType = lm.get_pointer(key)
         if t == float:
-            lm.set_pointer(key, pointer[0])
+            lm.set_pointer(key, pointer[0], ptrType)
         elif t == int:
-            lm.set_pointer(key, int(pointer[0]))
+            lm.set_pointer(key, int(pointer[0]), ptrType)
         else:
-            lm.set_pointer(key, pointer.astype(t)) # if it is some casted numpy type
+            lm.set_pointer(key, pointer.astype(t), ptrType) # if it is some casted numpy type
 
             
             

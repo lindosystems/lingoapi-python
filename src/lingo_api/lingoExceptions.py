@@ -19,8 +19,19 @@ class TypeNotSupportedError(lingoException):
     """
     def __init__(self, error):
         self.error = error
-        self.message = "Unsupported type\nPreferred type: NumPy Array of numpy.double\nOther excepted: NumPy array of numbers, Int, floats"
+        self.message = "Unsupported type\nexcepted: NumPy array of numbers, Int, floats"
         super().__init__(self.error, self.message)  
+
+class PointerTypeNotSupportedError(lingoException):
+    """ Exception rasied for sending an unsupported pointer type
+        supported types VAR, PARAM, SET
+        error: What was set as a type
+    """
+    def __init__(self, error):
+        self.error = error
+        self.message = "is not a supported pointer type\Supported types:\nlingo_api.SET\nlingo_api.PARAM\nlingo_api.VAR"
+        super().__init__(self.error, self.message)
+
 class LingoError(lingoException):
     """ Exception rasied for errors thrown by the API
     Attributes:
