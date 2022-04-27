@@ -78,9 +78,9 @@ Model data is passed in a Python object called lingo.api using the Model method.
 `lingo_api.Model(lngFile, logFile=”model.log”, cbSolver=None, cbError=None, uData=None)`, where:
 
 * **lngFile**: A string containing the path to the Lingo model file. The model must be saved in Lingo in LNG (text) format. LG4 (binary) format model files may not currently be passed to the Lingo API. The model’s expressions must also be bracketed with a MODEL: statement at the start and an END statement at the end of the model (refer to any of the sample LNG model files to see the placement of these commands).
-* **logFile**: An optional string path to a logfile that will created by the API. The log file is useful for debugging. Whenever you experience problems calling the Lingo API, be sure to review the contents of this log file for any errors. By default, it will be named ”model.log”, and will be saved to the same directory as the python script running the model.
-* **cbSolver**: An optional callback function written in pure python that will be called by Lingo periodically. There are three Lingo getter functions that can be used to return information from the solver.
-* **cbError**: An optional callback function written in pure python that will execute when Lingo raises an error. This will allow for the user to raise the error in python terminating the script and providing some detail on what should be fixed.
+* **logFile**: An optional string path to a logfile that will created by the API. The log file is useful for debugging. Whenever you experience problems calling the Lingo API, be sure to review the contents of this log file for any errors. By default, it will be named ”model.log”, and will be saved to the same directory as the Python script running the model.
+* **cbSolver**: An optional callback function written in pure Python that will be called by Lingo periodically. There are three Lingo getter functions that can be used to return information from the solver.
+* **cbError**: An optional callback function written in pure Python that will execute when Lingo raises an error. This will allow for the user to raise the error in Python terminating the script and providing some detail on what should be fixed.
 * **uData**:  Is data passed to the callback functions and must be set to something other than None for the callback functions to be passed to the API.
 
 ## Setting Pointers
@@ -167,14 +167,14 @@ The Lingo API supports two types of callback functions that are defined by the u
 User data is set `set_uData()` and is required to be set to something other than None. A useful data type is a dictionary since can be made filled with any type of data that can be accessed with a key.
 
 ```python
-uData = {“Prefix”: “Lingo API”, “Postfix”: “…”, “LastItter”:-1, “nVars”=Nvars}
+uData = {“Prefix”: “Lingo API”, “Postfix”: “…”, “LastIter”:-1, “nVars”=Nvars}
 model.set_uData(uData)
 ``` 
-The example above uses dictionary to pass three pieces of data to the callback functions. The prefix and Postfix can be used in the callback printout. The `LastItter` can be used when the solver callback is sending data from the same iteration, and you only want to printout that iteration once.
+The example above uses a dictionary to pass three pieces of data to the callback functions. The Pefix and Postfix can be used in the callback printout. The `LastIter` can be used when the solver callback is sending data from the same iteration, and you only want to printout that iteration once.
 
 ### Solver Callback
  
-The solver callback is set with `set_cbSolver(cbSolver)` and must be a function written in python. This callback function can request data from three different getter functions included in the lingo_api package. The python function has a few requirements that it must conform to in order to run properly. The first is the function parameters and the order in which they appear in the definition. The second is that the function must return 0 if successful or should raise an exception.
+The solver callback is set with `set_cbSolver(cbSolver)` and must be a function written in Python. This callback function can request data from three different getter functions included in the Lingo API. The Python function has a few requirements that it must conform to in order to run properly. The first is the function parameters and the order in which they appear in the definition. The second is that the function must return 0 if successful or should raise an exception.
 
 ```python
 def cbSolver(pEnv, nReserved, uData):
@@ -186,17 +186,20 @@ def cbSolver(pEnv, nReserved, uData):
 The three parameters are passed to the call back function by Lingo from the API.
 
 * **pEnv**: The environment pointer for the model and is used as an argument for the API callback getter functions.
-* **nReserved**: an integer reserved for future versions of Lingo. This will always be 0 if printed out and is not used in any arguments for any API getter functions.
+* **nReserved**: An integer reserved for future versions of Lingo. This will always be 0 if printed out and is not used in any arguments for any API getter functions.
 * **uData**: The user data that is set by the user.
 
 #### Solver Callback Getter Function
 
-`pyLSgetIntCallbackInfoLng(penv, nobject, result)` and `pyLSgetDouCallbackInfoLng(penv, nobject, result)` the main difference being the type of data that it they return indicated by Int for integer and Dou for double.
+`pyLSgetIntCallbackInfoLng(penv, nobject, result)`
+`pyLSgetDouCallbackInfoLng(penv, nobject, result)` 
+
+The main difference between these two functions is the type of data they return, indicated by Int for integer and Dou for double.
 
 * **penv**: The pointer to the Lingo environment that is solving the model.
-* **nobject**: An integer that indicates what information will be inserted into result. The name of the `nObject` can be used as well for example 0 is `lingo_api.LS_INFO_VARIABLES_LNG`.
-* **Result**: A NumPy array with a specified data type corresponding to which getter function is being used. If Int is being used then the data type of the array must be set to numpy.int32, and if it is Dou then the type must be set to numpy.double.
-* **Returns**: An error code that should be checked before proceeding see the error code section for a detailed table of possible returns. To raise an exception use `LingoError(errorcode)`.
+* **nobject**: An integer that indicates what information will be inserted into result. The name of `nobject` can be used as well for example 0 is `lingo_api.LS_INFO_VARIABLES_LNG`.
+* **result**: A NumPy array with a specified data type corresponding to which getter function is being used. If Int is being used then the data type of the array must be set to numpy.int32, and if it is Dou then the type must be set to numpy.double.
+* **Returns**: An error code that should be checked before proceeding see the error code section for a detailed table of possible returns. To raise an exception use `LingoError(errorcode)`, as we illustrate here:
 
 ```python
 nIters = numpy.array([-1], dtype=numpy.int32)
@@ -221,12 +224,13 @@ if errorcode != lingo_api.LSERR_NO_ERROR_LNG:
 |   11|`LS_DINFO_MIP_BOUND_LNG`| `Double`| Objective bound (IPs only)|
 |   12|`LS_DINFO_MIP_BEST_OBJECTIVE_LNG`| `Double`| Best objective value found so far (IPs only)|
  
-To retrieve data specific to a variable use `LSgetCallbackVarPrimalLng(penv, varName, values)`. This variable can be any variable set in the `.lng` script and does not need to be assigned to any pointers.
+To retrieve data specific to a variable use `LSgetCallbackVarPrimalLng(penv, varName, values)`. This variable can be any variable set in the Lingo script and does not need to be assigned to any pointers.
 
-* **penv**: The pointer to the Lingo environment that is solving the model.
-* **varName**: A NumPy array of a string type that is accessible by the C API `|s1024`. Where s is string and `1024` is an arbitrary buffer size needs to be big enough to hold the entire string.
+* **penv**: The pointer to the Lingo environment that is being used to solve the model.
+* **varName**: A NumPy array of a string type that is accessible by the C API `|s1024`. Where s is string and `1024` is an arbitrary buffer size that needs to be long enough to hold the entire string.
 * **values**: A NumPy array of type double that is at least the length of the number of values being returned.
 
+An example follows:
 ```python
 varName = np.array([“X”], dtype=”|s1024”)
 val  = np.zeros(uData[“Nvars”],dtype=np.double)
@@ -237,18 +241,18 @@ if errorcode != lingo_api.LSERR_NO_ERROR_LNG:
 
 ### Error Callback
 
-The error callback is set with `set_cbError(cbError)` and must be a function written in python. The python function has a few requirements that it must conform to in order to run properly. The first is the function parameters and the order in which they appear in the definition. The second is that the function must returns nothing, and when it is called it is best to raise an exception to stop the program from running and display the error message.
+The error callback is set with `set_cbError(cbError)` and must be a function written in Python. The Python function has a few requirements that it must conform to in order to run properly. The first is the function parameters and the order in which they appear in the definition. The second is that the function must return nothing, and when it is called it is best to raise an exception to stop the program from running and display the error message as illustrated here:
 
 ```python
 def cbError(penv, uData, nErrorCode, errorText):
 	raise lingo_api.CallBackError(nErrorCode, errorText)
 ```
 
-This is one way to implement the call back function that will stop the program from running and display the error.
+The error callback's arguments are as follows:
 
-* **penv**: The pointer to the Lingo environment that is solving the model.
-* **uData**: The user data that is set by the user.
-* **nErrorCode**: The error code number that correspond to the error.
+* **penv**: The pointer to the Lingo environment used to solve the model.
+* **uData**: The user's data, which is set by the user.
+* **nErrorCode**: The error code number that corresponds to the error.
 * **errorText**: A string with the reason for the error and some information on fixing it.
 
 ## Troubleshooting
@@ -354,7 +358,7 @@ lingo_api.lingoExceptions.LingoError: 1 -> Out of dynamic system memory.
 
 ### Type Error
  
-The `ptrData` set by `model.set_pointer()` needs to be NumPy arrays, floats, or ints. Otherwise, an exception will be `TypeNotSupportedError` will be raised, and python script will be terminated.
+The `ptrData` set by `model.set_pointer()` needs to be NumPy arrays, floats, or ints. Otherwise, an exception will be `TypeNotSupportedError` will be raised, and Python script will be terminated.
 
 ```command
 (myenv) C:\Users\James\Documents\GitHub\lingoapi-python\examples\NETWORK>py shortestPath.py
@@ -373,7 +377,7 @@ The `ptrType` set by `model.set_pointer()` needs to be of the three lindo_api co
 * **Lingo_api.Param**: Use if `ptrData` is constant model data.
 *  **Lingo_api.VAR**: Use if ptrData is for a variable.
 
-Otherwise, an `PointerTypeNotSupportedError` exception will be raised, and python script will be terminated.
+Otherwise, an `PointerTypeNotSupportedError` exception will be raised, and Python script will be terminated.
 
 ```command
 (myenv) C:\Users\James\Documents\GitHub\lingoapi-python\examples\NETWORK>py shortestPath.py
@@ -389,7 +393,7 @@ lingo_api.VAR
 ```
 ## How to Build Wheel and Install (for package managers)
 
-To build the python package on any operating system first start by creating a `whl` file. From the top of the lingoapi-python directory run the command.
+To build the Python package on any operating system first start by creating a `whl` file. From the top of the lingoapi-python directory run the command.
 
 ```python
 python -m build
