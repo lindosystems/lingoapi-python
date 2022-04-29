@@ -11,12 +11,8 @@ struct module_state {
     PyObject *error;
 };
 
-#if PY_MAJOR_VERSION >= 3
 #define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
+
 
 
 
@@ -65,14 +61,14 @@ static PyMethodDef lingo_methods[] =
     {NULL, NULL}
 };
 
-
+/*New Exceptions*/
+static PyObject *InterruptionError;
 /* PyObjects for Callbacks*/
 static PyObject *cbpyEnv   = NULL;
 static PyObject *cbSolver  = NULL;
 static PyObject *cbError   = NULL;
 static PyObject *cbuData   = NULL;
 
-#if PY_MAJOR_VERSION >= 3
 
 static int lingo_traverse(PyObject *m, visitproc visit, void *arg) 
 {
@@ -99,28 +95,21 @@ static struct PyModuleDef moduledef =
         NULL
 };
 
-#define INITERROR return NULL
 
-PyObject *PyInit_lingo(void)
 
-#else
-#define INITERROR return
 
-void
-initlingo(void)
-#endif
-{
-#if PY_MAJOR_VERSION >= 3
+
+PyMODINIT_FUNC
+PyInit_lingo(void){
+
     PyObject *module = PyModule_Create(&moduledef);
-#else
-    PyObject *module = Py_InitModule("lingo", lingo_methods);
-#endif
+
 
     import_array();  // to initialize NumPy
 
     if (module == NULL)
     {
-        INITERROR;
+         return NULL;
     }
 
     {
@@ -130,13 +119,22 @@ initlingo(void)
         if (st->error == NULL) 
         {
             Py_DECREF(module);
-            INITERROR;
+             return NULL;
+        }
+
+        // User Interupted Error
+        InterruptionError = PyErr_NewException("lingo_api.Interruption", NULL, NULL);
+        Py_XINCREF(InterruptionError);
+        if (PyModule_AddObject(module, "error", InterruptionError) < 0) {
+            Py_XDECREF(InterruptionError);
+            Py_CLEAR(InterruptionError);
+            Py_DECREF(module);
+            return NULL;
         }
     }
 
-#if PY_MAJOR_VERSION >= 3
     return module;
-#endif
+
 }
 
 #define PyCreatObj(dim,type,pyobj,array) \
@@ -144,21 +142,15 @@ dimension[0] = dim;\
 pyobj = (PyArrayObject *)PyArray_SimpleNewFromData(1,dimension,type,(void *)(array));\
 pyobj->flags |= NPY_OWNDATA;\
 
-#if PY_MAJOR_VERSION < 3
-    #define PyNewObjPtr(pointer_to_value)\
-    PyCObject_FromVoidPtr ((void *)pointer_to_value, NULL)
-#else
-    #define PyNewObjPtr(pointer_to_value)\
-    PyCapsule_New((void *)pointer_to_value, NULL, NULL)
-#endif
 
-#if PY_MAJOR_VERSION < 3
-    #define PyGetObjPtr(pointer_to_value)\
-    PyCObject_AsVoidPtr(pointer_to_value)
-#else
-    #define PyGetObjPtr(pointer_to_value)\
-    PyCapsule_GetPointer(pointer_to_value, NULL)
-#endif
+#define PyNewObjPtr(pointer_to_value)\
+PyCapsule_New((void *)pointer_to_value, NULL, NULL)
+
+
+
+#define PyGetObjPtr(pointer_to_value)\
+PyCapsule_GetPointer(pointer_to_value, NULL)
+
 
 #define CHECK_ENV\
     pEnv = PyGetObjPtr(pyEnv);\
@@ -452,6 +444,11 @@ int CALLTYPE relayCallbackSolver(pLSenvLINGO pL, int nReserved, void *pUserData)
         Py_XDECREF(result);
         Py_DECREF(arglist);
     }
+    if (retvalue == -1){
+        char errormsg[] = "[Error Code:   73]\n\n A user interrupt occurred.";
+        PyErr_SetString(InterruptionError, errormsg);
+        return PyErr_Occurred();
+    }
     return retvalue;
 }
 
@@ -510,6 +507,8 @@ void CALLTYPE relayCallbackError(pLSenvLINGO pL, void *pUserData, int nErrorCode
         Py_XDECREF(result);
         Py_DECREF(arglist);
     }
+
+
 }
 
 PyObject *pyLSsetCallbackErrorLng(PyObject *self, PyObject *args)
