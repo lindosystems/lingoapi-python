@@ -61,7 +61,7 @@ cashew_i   = 1
 # Decision variable data allocation
 PRODUCE    = np.zeros(len(PRICE))
 # For checking if the model was solved
-STATUS     = -1
+STATUS     = -1.0
 
 NUT_COUNT   = len(SUPPLY)
 BRAND_COUNT = len(PRICE)
@@ -82,8 +82,7 @@ model.set_uData(uData)
 lingo.solve(model)
 # get STATUS since it is not an NumPy array
 # it need to retrived from model
-STATUS  = model.get_pointer("Pointer7")
-
+STATUS, ptrType  = model.get_pointer("Pointer7")
 
 # check that the model has ben solved
 if STATUS == lingo.LS_STATUS_GLOBAL_LNG:

@@ -1,0 +1,12 @@
+MODEL
+
+SETS:
+    TEST: X;
+ENDSETS
+
+DATA:
+    TEST = @POINTER(1);
+    X    = @POINTER(2);
+ENDDATA
+
+END
