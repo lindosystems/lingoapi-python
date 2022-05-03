@@ -11,7 +11,7 @@ import numpy as np
 # the shortestPath.lng script
 uData = {}
 # Callback solver 
-def cbSolverInterupt(pEnv, nReserved, uData): 
+def cbSolverInterrupt(pEnv, nReserved, uData): 
     return -1
 
 def cbSolver(pEnv, nReserved, uData): 
@@ -25,9 +25,9 @@ def cbError(pEnv, uData, nErrorCode, errorText):
         exit(1)
 
 """
-This model calls a callback function `cbSolverInerupt` which returns -1 interrupting the model.
+This model calls a callback function `cbSolverInterrupt` which returns -1 interrupting the model.
 """
-def interuptedModel(lngFile):
+def interruptedModel(lngFile):
     # Naming the set members
     TEST = np.array(["T1", "T2", "T3"])
     X    = np.zeros(len(TEST))
@@ -38,7 +38,7 @@ def interuptedModel(lngFile):
     model.set_pointer("Pointer2",X,lingo.VAR)
 
     # set the call back function and user data
-    model.set_cbSolver(cbSolverInterupt)
+    model.set_cbSolver(cbSolverInterrupt)
     model.set_cbError(cbError)
     model.set_uData(uData)
     return model
@@ -120,13 +120,16 @@ def emptyPointerModel(lngFile):
     model.set_uData(uData)
     return model
 
+"""
+run(model) prints the model then it calls solve wrapped in a try/except block.
+"""
 def run(model):  
     print(model)
     try:
         lingo.solve(model)
     except lingo.LingoError as err:
         if(err.error == 73):
-            print(f"{lngFile} has been interupted!")
+            print(f"{lngFile} has been interrupted!")
         else:
             print(err)
 
@@ -144,8 +147,8 @@ lngFile = "errorTest.lng"
 
 print("\n","*"*60,"\n")
 
-print("Testing a model that is interupted: \n")
-model = interuptedModel(lngFile)
+print("Testing a model that is interrupted: \n")
+model = interruptedModel(lngFile)
 run(model)
 print("\n","*"*60,"\n")
 
@@ -156,13 +159,13 @@ run(model)
 print("\n","*"*60,"\n")
 
 
-print("Testing a model with invalid pointer type: \n")
+print("Testing a model with an invalid pointer type: \n")
 model = nonPointerTypeModel(lngFile)
 run(model)
 print("\n","*"*60,"\n")
 
 
-print("Testing a model with invalid pointer data type: \n")
+print("Testing a model with an invalid pointer data type: \n")
 model = typeNotSupportedModel(lngFile)
 run(model)
 print("\n","*"*60,"\n")
