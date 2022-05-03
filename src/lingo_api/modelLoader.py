@@ -1,3 +1,5 @@
+from pyexpat import model
+from traceback import print_tb
 from .const           import *
 from .lingoExceptions import *
 from .lingo           import *
@@ -72,6 +74,17 @@ class Model():
         """set_uData sets uData dictionary"""
         self.uData = uData
 
+    def __str__(self):
+
+        modelStr = f"Lingo Model {self.lngFile}\nPointers Set:"
+        for key, tuple in self._pointerDict.items():
+            try:
+                ptrType = PtrTypeDict[tuple[1]]
+            except Exception:
+                ptrType = tuple[1] 
+
+            modelStr += f"\nName :{key}\nType :{ptrType}\nData :{tuple[0]}\n"
+        return modelStr
 
 
 
@@ -169,6 +182,9 @@ def solve(lm:Model):
     cScript = "SET ECHOIN 1 \n TAKE "+lm.lngFile+" \n GO \n QUIT \n"
     errorcode = pyLSexecuteScriptLng(pEnv, cScript)
     if errorcode != LSERR_NO_ERROR_LNG:
+        errorcode2 = pyLScloseLogFileLng(pEnv)
+        errorcode3 = pyLSdeleteEnvLng(pEnv)
+        _resetChanges(lm)
         raise LingoError(errorcode)
 
     #Close the log file

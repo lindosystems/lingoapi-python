@@ -12,14 +12,16 @@ class lingoException(Exception):
         self.message = message
     def __str__(self):
         return f"{self.error} -> {self.message}"
-
+class InterruptionError(lingoException):
+    def __init__(self, error, message):
+        super().__init__(error, message)
 class TypeNotSupportedError(lingoException):
     """ Exception rasied for sending an unsupported datatype as a pointer
         error: a discrtipion of what rasied the error
     """
     def __init__(self, error):
         self.error = error
-        self.message = "Unsupported type\nexcepted: NumPy array of numbers, Int, floats"
+        self.message = "Unsupported type\nExcepted For VAR/PARAM: NumPy array of numbers, Int, floats\nExcepted For       SET: NumPy array of String or Int"
         super().__init__(self.error, self.message)  
 
 class PointerTypeNotSupportedError(lingoException):

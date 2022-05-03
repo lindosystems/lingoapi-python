@@ -1,6 +1,7 @@
 #include "Python.h"
 #include "arrayobject.h"
 #include "stdlib.h"
+#include "stdbool.h"
 #include "stdio.h"
 #include "lingd19.h"
 #include "string.h"
@@ -68,7 +69,8 @@ static PyObject *cbpyEnv   = NULL;
 static PyObject *cbSolver  = NULL;
 static PyObject *cbError   = NULL;
 static PyObject *cbuData   = NULL;
-
+static bool usr_interrupt = false;
+static bool cbError_set   = false;
 
 static int lingo_traverse(PyObject *m, visitproc visit, void *arg) 
 {
@@ -122,15 +124,6 @@ PyInit_lingo(void){
              return NULL;
         }
 
-        // User Interupted Error
-        InterruptionError = PyErr_NewException("lingo_api.Interruption", NULL, NULL);
-        Py_XINCREF(InterruptionError);
-        if (PyModule_AddObject(module, "error", InterruptionError) < 0) {
-            Py_XDECREF(InterruptionError);
-            Py_CLEAR(InterruptionError);
-            Py_DECREF(module);
-            return NULL;
-        }
     }
 
     return module;
@@ -160,6 +153,10 @@ PyCapsule_GetPointer(pointer_to_value, NULL)
         printf("Illegal NULL pointer (error %d)\n",nErrLng);\
         return Py_BuildValue("i",nErrLng);\
     }\
+
+#define Reset_CB_Flags\
+    usr_interrupt = false;\
+    cbError_set   = false;\
 
 PyObject *pyLScreateEnvLng(PyObject *self, PyObject *args)
 {
@@ -295,6 +292,18 @@ PyObject *pyLSexecuteScriptLng(PyObject *self, PyObject *args)
     CHECK_ENV;
 
     nErrLng = LSexecuteScriptLng(pEnv, paScript);
+
+    if(usr_interrupt){
+        PyErr_Clear();
+        nErrLng = 73;
+        Reset_CB_Flags;
+
+    }
+    if(cbError_set){
+        PyErr_Clear();
+        nErrLng = 1001;
+        Reset_CB_Flags;
+    }
 
     return Py_BuildValue("i",nErrLng); 
 }
@@ -445,9 +454,7 @@ int CALLTYPE relayCallbackSolver(pLSenvLINGO pL, int nReserved, void *pUserData)
         Py_DECREF(arglist);
     }
     if (retvalue == -1){
-        char errormsg[] = "[Error Code:   73]\n\n A user interrupt occurred.";
-        PyErr_SetString(InterruptionError, errormsg);
-        return PyErr_Occurred();
+        usr_interrupt = true;
     }
     return retvalue;
 }
@@ -502,11 +509,14 @@ void CALLTYPE relayCallbackError(pLSenvLINGO pL, void *pUserData, int nErrorCode
         if (arglist)
             result = PyEval_CallObject(cbError, arglist);
     }
-
+    if(PyErr_Occurred()){
+        cbError_set = true;
+    }
     {
         Py_XDECREF(result);
         Py_DECREF(arglist);
     }
+
 
 
 }

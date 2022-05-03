@@ -7,6 +7,8 @@ LSERR_INFO_NOT_AVAILABLE_LNG        = 5
 LSERR_UNABLE_TO_COMPLETE_TASK_LNG   = 6
 LSERR_INVALID_LICENSE_KEY_LNG       = 7
 LSERR_INVALID_VARIABLE_NAME_LNG     = 8
+LSERR_USER_INTERRUPT_LNG            = 73
+LSERR_CALLBACK_ERROR_SET            = 1001
 LSERR_JNI_CALLBACK_NOT_FOUND        = 1000
 
 ErrorDict = {
@@ -18,6 +20,8 @@ ErrorDict = {
     LSERR_UNABLE_TO_COMPLETE_TASK_LNG   :"Unable to successfully complete the specified task.",
     LSERR_INVALID_LICENSE_KEY_LNG       :"The license key passed to LScreateEnvLicenceLng() was invalid.",
     LSERR_INVALID_VARIABLE_NAME_LNG     :"A variable name passed to LSgetCallbackVarPrimal() was invalid.",
+    LSERR_USER_INTERRUPT_LNG            :"A user interrupt occurred.",
+    LSERR_CALLBACK_ERROR_SET            :"The error callback function raised an exception.",
     LSERR_JNI_CALLBACK_NOT_FOUND        :"A valid callback function was not found",
 
 }
@@ -51,3 +55,4 @@ LS_STATUS_NUMERIC_ERROR_LNG         = 9
 SET      = 0
 PARAM    = 1
 VAR      = 2
+PtrTypeDict = {0: "SET", 1: "PARAM", 2: "VAR"}

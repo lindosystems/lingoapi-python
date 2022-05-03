@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "19.0.5"
+VERSION = "19.0.6"
 
 class BuildData():
     """
