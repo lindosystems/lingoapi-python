@@ -141,6 +141,8 @@ def run(model):
    
     except lingo.PointerTypeNotSupportedError as err:
         print(err)
+    except Exception as err:
+        print(err)
   
 
 lngFile = "errorTest.lng"
