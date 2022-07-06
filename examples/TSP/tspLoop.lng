@@ -1,0 +1,152 @@
+MODEL:
+DATA:
+    MAXCUTS = @POINTER( 1);
+    MAXADD  = @POINTER( 2);
+ENDDATA
+    
+SETS:
+    CITY: LATI, LNGT, VISITED; 
+    LINK( CITY, CITY):  DIST, Y;  
+    SUBTOUR: TOURSIZE;
+    SXC( SUBTOUR,CITY): FLAG;
+ENDSETS
+DATA:
+    SUBTOUR = 1..MAXCUTS;
+    CITY    = @POINTER( 3);
+    LATI    = @POINTER( 4);
+    LNGT    = @POINTER( 5);
+ENDDATA
+!-----------------------------------------------------------;
+SUBMODEL TSP_CUT:
+! Minimize total distance traveled;
+ MIN = OBJV;
+ OBJV =  @SUM( LINK(i,j): DIST(i,j) * Y(i,j));
+
+! The Assignment constraints;
+  @FOR( CITY( K):
+    !City K must be entered;
+    @SUM( CITY( I)| I #NE# K: Y( I, K))= 1;
+    !City K must be departed;
+    @SUM( CITY( J)| J #NE# K: Y( K, J))= 1;
+    !Cannot go to yourself; 
+    Y( K, K) = 0;
+   );
+
+  !Subtour cuts;
+  @FOR( SUBTOUR(t)| t #LE# TOTALTOURS:
+  !FLAG(t,i) = 1 if city i is in subtour t;
+    @SUM( CITY(I) | FLAG(t,i) #EQ# 1:
+      @SUM( CITY(J) | FLAG(t,j) #EQ# 1: Y(i,j))) <= TOURSIZE(t) - 1;
+      );
+
+    @FOR(LINK(I,J): @BIN(Y(I,J))); 
+ENDSUBMODEL
+
+PROCEDURE FIND_ALL_TOURS:
+
+   ! Start from top of the node list;
+   ! with VISITED set to 0s;
+    @FOR( CITY(i): VISITED(i) = 0;);
+
+    KURPOS = 0;
+    ADDED  = 0;
+    @while(KURPOS #LT# N #AND# QUIT #EQ# 1 #AND# added #LT# MAXADD:
+
+        !Found start of tour;
+        FOUNDNEXT = 1;
+      
+        @while( FOUNDNEXT #EQ# 1 #AND# KURPOS #LT# N:
+            KURPOS = KURPOS + 1;
+            @ifc( VISITED( KURPOS) #EQ# 0:
+                FOUNDNEXT = 0;
+                );
+            );
+        !Loop over tour until end add to tour list;
+        KURSTOP = KURPOS;
+        QUIT2 = 1;
+        TOURSIZE(ICUT) = 0;
+        @WHILE( QUIT2:
+        !Loop over possible next cities j;
+        @FOR(CITY(J):
+            @IFC( Y(KURSTOP, J) #GT# .5:   
+                NEXT1 = J;
+                ););
+                KURSTOP = NEXT1;
+                VISITED( KURSTOP) = 1;
+                TOURSIZE(ICUT) = TOURSIZE(ICUT) + 1;
+                FLAG(ICUT,KURSTOP) = 1;
+                @IFC( KURSTOP #EQ# KURPOS:  ! Back home/Completed the subtour?;
+                    QUIT2 = 0;
+                );
+        );
+        added = added + 1;
+        ! If subtour is in fact a full tour, or out of space, get out;
+        @IFC(TOURSIZE(ICUT) #EQ# N:
+            QUIT = 0;
+            SOLVED = 0;
+            @FOR( LINK: Y = Y); 
+        );
+        @IFC(ICUT #GE# MAXCUTS:
+            QUIT = 0;
+            SOLVED = 1;
+            @FOR( LINK: Y = Y); 
+        );
+        ICUT = ICUT + 1;
+    );
+    
+   
+ENDPROCEDURE
+
+CALC:
+    !@SET( 'TERSEO',2); ! Output level (0:verb, 1:terse, 2:only errors, 3:none);
+! This portion calculates the distance matrix DIST(i,j)
+   ! Degrees to radians conversion factor;
+ ! Compute Great Circle Distances. Radius of earth = 6371 km.
+  Notice this simplifies if LATI(i) = LATI(j) or LNGT(i) = LNGT(j);
+  D2R=@PI()/180;
+  @FOR( LINK(i,j):
+     @IFC( i #EQ# j: DIST(i,j) = 0;! Get rid of trivial roundoff;
+       @ELSE 
+        DIST( i,j) = 6371*@acos(@SIN(D2R*LATI(i))*@SIN(D2R*LATI(j))+@COS(D2R*LATI(i))*@COS(D2R*LATI(j))
+                  *@COS(@ABS(D2R*(LNGT(i)-LNGT(j)))));
+         );
+    ); 
+    N = @SIZE( CITY);
+
+    @FOR( SXC(t,i): FLAG(t,i) = 0;);
+
+    ICUT = 1;
+    TOTALTOURS = 0;
+    QUIT = 1;
+    !If Solved is 0 then a path has been found;
+    !Else if solved is 1 the model ran out of path storage;
+    SOLVED = -1;
+    !Use STATE as a flag for when to print callback data;
+    STATE = 0;
+    
+    @WHILE( QUIT : 
+        STATE = 0;
+        !Solve current version;
+        @SOLVE( TSP_CUT);
+
+        !Call function to get the sub tours;
+        FIND_ALL_TOURS;
+        
+        STATE = 1;
+        TOTALTOURS = ICUT - 1;
+        KURTIME = @time();
+    );
+
+    KURTIME = @time();
+    STATE = 2;    
+
+    
+ENDCALC
+
+DATA:
+    @POINTER( 6) = Y;
+    @POINTER( 7) = DIST; 
+    @POINTER( 8) = SOLVED;
+ENDDATA
+
+END
