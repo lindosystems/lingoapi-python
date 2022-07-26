@@ -3,7 +3,7 @@
 #include "stdlib.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "lingd19.h"
+#include "lingd20.h"
 #include "string.h"
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION

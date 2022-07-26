@@ -79,8 +79,8 @@ class LoadException():
 
     def __init__(self):
 
-        self.LINGO_HOME = os.environ.get('LINGO_19_HOME')
-        self.LINGO64_HOME = os.environ.get('LINGO64_19_HOME')
+        self.LINGO_HOME = os.environ.get('LINGO_20_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_20_HOME')
         self.platform     = platform.system()
         self.is_64bits    = sys.maxsize > 2**32
         self.errorMessage = self.getMessage()
@@ -97,13 +97,13 @@ class LoadException():
                         Libifcoremd.dll                                                         \n\
                         Libiomp5md.dll                                                          \n\
                         Libmmd.dll                                                              \n\
-                        Lindo64_13_0.dll                                                        \n\
-                        Lindopr64_8.dll                                                         \n\
-                        Lingd64_19.dll                                                          \n\
+                        Lindo64_14_0.dll                                                        \n\
+                        Lindopr64_11.dll                                                         \n\
+                        Lingd64_20.dll                                                          \n\
                         Lingdb64_3.dll                                                          \n\
-                        Lingf64_19.dll                                                          \n\
-                        Lingfd64_19.dll                                                         \n\
-                        Lingj64_19.dll                                                          \n\
+                        Lingf64_20.dll                                                          \n\
+                        Lingfd64_20.dll                                                         \n\
+                        Lingj64_20.dll                                                          \n\
                         Lingoau64_14.dll                                                        \n\
                         Lingr64_1.dll                                                           \n\
                         Lingxl64_5.dll                                                          \n\
@@ -122,17 +122,17 @@ class LoadException():
                         Libifcoremd.dll                                                         \n\
                         Libiomp5md.dll                                                          \n\
                         Libmmd.dll                                                              \n\
-                        Lindo64_13_0.dll                                                        \n\
-                        Lindopr_8.dll                                                         \n\
-                        Lingd_19.dll                                                          \n\
-                        Lingdb_3.dll                                                          \n\
-                        Lingf_19.dll                                                          \n\
-                        Lingfd_19.dll                                                         \n\
-                        Lingj_19.dll                                                          \n\
-                        Lingoau_14.dll                                                        \n\
-                        Lingr_1.dll                                                           \n\
-                        Lingxl_5.dll                                                          \n\
-                        Mosek_9_2.dll                                                         \n\
+                        Lindo14_0.dll                                                           \n\
+                        Lindocu_19.dll                                                           \n\
+                        Lindopr11.dll                                                           \n\
+                        Lingd20.dll                                                            \n\
+                        Lingdb20.dll                                                            \n\
+                        Lingf20.dll                                                            \n\
+                        Lingfd20.dll                                                           \n\
+                        Lingj20.dll                                                            \n\
+                        Lingr_1.dll                                                             \n\
+                        Lingxl5.dll                                                            \n\
+                        Mosek9_2.dll                                                           \n\
                         Msvcr120.dll                                                            \n\
                     "
 
