@@ -106,8 +106,8 @@ def samsizr(AQL,LTFD,PRDRISK,CONRISK,MINSMP,MAXSMP):
         print("\nSolution is non-optimal\n")
 
     #check solution
-    print("\nThe Optimal sample size is ",NN,".\nAccept the lot if ",
-           C," or less defectives in sample.\n\n")
+    print("\nThe Optimal sample size is ",NN[0],".\nAccept the lot if ",
+           C[0]," or less defectives in sample.\n\n")
 
     #delete Lingo enviroment object
     errorcode = lingo.pyLSdeleteEnvLng(pEnv)
@@ -117,7 +117,6 @@ def samsizr(AQL,LTFD,PRDRISK,CONRISK,MINSMP,MAXSMP):
 ##############################################################################
 if __name__ == '__main__':
     samsizr(0.03,0.08,0.09,0.05,125.0,400.0)
-    sys.stdinp.read(1)
 
 
         
