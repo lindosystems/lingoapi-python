@@ -50,8 +50,8 @@ On the command line for windows 64
 On the command line
 
 For administrative users:
-```     
-$ export LINGO64_20_HOME="/opt/lingo19"	
+```    
+$ export LINGO64_20_HOME="/opt/lingo20"	
 ```    
 For standard (non-administrative) users:
 ```    
