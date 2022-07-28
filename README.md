@@ -4,7 +4,7 @@ This package requires Lingo and a valid license key. Please refer to [Lingo user
 
 ## Installation
 
-This python package can be installed with pip. It is assumed 64-bit Lingo 19 is installed on host system.
+This python package can be installed with pip. It is assumed 64-bit Lingo 20 is installed on host system.
 
 For administrative users: 
 
@@ -33,10 +33,10 @@ You can also try out the samples by
 
 ## Possible errors due to misconfiguration
 
-You may get the following error if your LINGO64_19_HOME environment variable is not set up.  
+You may get the following error if your LINGO64_20_HOME environment variable is not set up.  
 
 ```
-Error: Environment variable LINGO64_19_HOME should be set
+Error: Environment variable LINGO64_20_HOME should be set
 ```
 
 To fix the problem follow these steps
@@ -44,18 +44,18 @@ To fix the problem follow these steps
 ### Using Windows
 On the command line for windows 64
 ```dos
-> setx LINGO64_19_HOME "C:\LINGO64_19" 
+> setx LINGO64_20_HOME "C:\LINGO64_20" 
 ```
 ### Using Linux
 On the command line
 
 For administrative users:
-```     
-$ export LINGO64_19_HOME="/opt/lingo19"	
+```    
+$ export LINGO64_20_HOME="/opt/lingo20"	
 ```    
 For standard (non-administrative) users:
 ```    
-$ export LINGO64_19_HOME="~/opt/lingo19"	
+$ export LINGO64_20_HOME="~/opt/lingo20"	
 ```   
 To have this variable set automatically, add the above line to your `~/.bashrc` or `~/.bash_profile` file.
 
