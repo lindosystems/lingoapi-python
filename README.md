@@ -1,6 +1,6 @@
 # The Python Interface to LINGO.
 
-This package requires Lingo and a valid license key. Please refer to [Lingo user manual](https://lindo.com/downloads/PDF/LINGO.pdf) for installation instructions, and to learn more about the Lingo modeling language.
+This package requires Lingo and a valid license key. Please refer to the [Lingo user manual](https://lindo.com/downloads/PDF/LINGO.pdf) for installation instructions, and to learn more about the Lingo modeling language.
 
 ## Installation For LINGO 20
 
@@ -25,13 +25,13 @@ This python package can be installed with pip. It is assumed Lingo 19 is install
 For administrative users: 
 
 ```bash
-> pip install lingo_api==19.06
+> pip install lingo_api==19.0.6
 ```
 
 For standard (non-administrative) users:
 
 ```bash
-> pip install lingo_api==19.06 --user
+> pip install lingo_api==19.0.6 --user
 ```
 
 
@@ -61,21 +61,21 @@ On the command line depending on the users LINGO installation:
 
 LINGO 20 on windows 64-bit  
 ```dos
-> setx LINGO64_20_HOME "C:\\path\to\LINGO64_20" 
+> setx LINGO64_20_HOME "C:\path\to\LINGO64_20" 
 ```
 LINGO 20 on windows 32-bit 
 ```dos
-> setx LINGO_20_HOME "C:\\path\to\LINGO20" 
+> setx LINGO_20_HOME "C:\path\to\LINGO20" 
 ```
 
 
 LINGO 19 on windows 64-bit 
 ```dos
-> setx LINGO64_19_HOME "C:\\path\to\LINGO64_19"
+> setx LINGO64_19_HOME "C:\path\to\LINGO64_19"
 ```
 LINGO 19 on windows 32-bit  
 ```dos
-> setx LINGO_19_HOME "C:\\path\to\LINGO19"
+> setx LINGO_19_HOME "C:\path\to\LINGO19"
 ```
 
 ### Using Linux
@@ -88,7 +88,7 @@ $ export LINGO64_20_HOME="/opt/lingo20"
 ```    
 For standard (non-administrative) users:
 ```    
-$ export LINGO64_20_HOME="~/opt/lingo20"	
+$ export LINGO64_20_HOME="~/lingo20"	
 ```   
 
 LINGO 19
@@ -97,7 +97,7 @@ $ export LINGO64_19_HOME="/opt/lingo19"
 ```    
 For standard (non-administrative) users:
 ```    
-$ export LINGO64_19_HOME="~/opt/lingo19"	
+$ export LINGO64_19_HOME="~/lingo19"	
 ```   
 
 
