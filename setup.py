@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "20.0.0"
+VERSION = "20.0.1"
 
 class BuildData():
     """
@@ -97,7 +97,7 @@ setup_kwargs = {"name" : 'lingo-api',
                 "python_requires": ">=3.7",
                 "platforms" : ['Windows, Linux'],
                 "ext_modules" : [lingomodule],
-                "install_requires": ["numpy>=1.23"],
+                "install_requires": ["numpy>=1.19"],
                 "package_dir": {"": "src"},
                 "packages" : ['lingo_api', 'lingo_test'],
                 "package_data" : {'lingo_api': ['*.txt', 'pyLingo.c']},}
