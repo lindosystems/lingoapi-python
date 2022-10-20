@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "20.0.1"
+VERSION = "20.0.2"
 
 class BuildData():
     """
@@ -59,9 +59,9 @@ if bd.platform == 'Windows':
     extra_link_args = '-Wl,--enable-stdcall-fixup'
 
 if bd.platform == 'Linux':
-    IncludePath = os.path.join(bd.LINGO64_HOME,'programming_samples')
+    IncludePath = os.path.join(bd.LINGO_HOME,'programming_samples')
     LingoLib = 'lingo64'
-    LibPath = os.path.join(bd.LINGO64_HOME, 'bin/linux64')
+    LibPath = os.path.join(bd.LINGO_HOME, 'bin/linux64')
 
     extra_link_args = '-Wl,-rpath-link,' + LibPath + ' -Wl,-rpath,' + LibPath
     macros = []
