@@ -84,20 +84,20 @@ On the command line depending on the users LINGO installation:
 LINGO 20
 For administrative users:
 ```    
-$ export LINGO64_20_HOME="/opt/lingo20"	
+$ export LINGO_20_HOME="/opt/lingo20"	
 ```    
 For standard (non-administrative) users:
 ```    
-$ export LINGO64_20_HOME="~/lingo20"	
+$ export LINGO_20_HOME="~/lingo20"	
 ```   
 
 LINGO 19
 ```    
-$ export LINGO64_19_HOME="/opt/lingo19"	
+$ export LINGO_19_HOME="/opt/lingo19"	
 ```    
 For standard (non-administrative) users:
 ```    
-$ export LINGO64_19_HOME="~/lingo19"	
+$ export LINGO_19_HOME="~/lingo19"	
 ```   
 
 
