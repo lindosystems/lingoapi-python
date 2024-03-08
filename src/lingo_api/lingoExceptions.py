@@ -79,8 +79,8 @@ class LoadException():
 
     def __init__(self):
 
-        self.LINGO_HOME = os.environ.get('LINGO_20_HOME')
-        self.LINGO64_HOME = os.environ.get('LINGO64_20_HOME')
+        self.LINGO_HOME = os.environ.get('LINGO_21_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_21_HOME')
         self.platform     = platform.system()
         self.is_64bits    = sys.maxsize > 2**32
         self.errorMessage = self.getMessage()
@@ -99,11 +99,11 @@ class LoadException():
                         Libmmd.dll                                                              \n\
                         Lindo64_14_0.dll                                                        \n\
                         Lindopr64_11.dll                                                         \n\
-                        Lingd64_20.dll                                                          \n\
+                        Lingd64_21.dll                                                          \n\
                         Lingdb64_3.dll                                                          \n\
-                        Lingf64_20.dll                                                          \n\
-                        Lingfd64_20.dll                                                         \n\
-                        Lingj64_20.dll                                                          \n\
+                        Lingf64_21.dll                                                          \n\
+                        Lingfd64_21.dll                                                         \n\
+                        Lingj64_21.dll                                                          \n\
                         Lingoau64_14.dll                                                        \n\
                         Lingr64_1.dll                                                           \n\
                         Lingxl64_5.dll                                                          \n\
@@ -125,11 +125,11 @@ class LoadException():
                         Lindo14_0.dll                                                           \n\
                         Lindocu_19.dll                                                           \n\
                         Lindopr11.dll                                                           \n\
-                        Lingd20.dll                                                            \n\
-                        Lingdb20.dll                                                            \n\
-                        Lingf20.dll                                                            \n\
-                        Lingfd20.dll                                                           \n\
-                        Lingj20.dll                                                            \n\
+                        Lingd21.dll                                                            \n\
+                        Lingdb21.dll                                                            \n\
+                        Lingf21.dll                                                            \n\
+                        Lingfd21.dll                                                           \n\
+                        Lingj21.dll                                                            \n\
                         Lingr_1.dll                                                             \n\
                         Lingxl5.dll                                                            \n\
                         Mosek9_2.dll                                                           \n\

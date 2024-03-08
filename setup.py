@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 
-VERSION = "20.0.1"
+VERSION = "21.0.7"
 
 class BuildData():
     """
@@ -17,10 +17,10 @@ class BuildData():
 
     """
     def __init__(self):
-        self.MAJOR = "20"
+        self.MAJOR = "21"
         self.MINOR = "0"
-        self.LINGO_HOME = os.environ.get('LINGO_20_HOME')
-        self.LINGO64_HOME = os.environ.get('LINGO64_20_HOME')
+        self.LINGO_HOME = os.environ.get('LINGO_21_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_21_HOME')
         self.platform = platform.system()
         self.is_64bits = sys.maxsize > 2**32
 

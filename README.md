@@ -4,7 +4,7 @@ This package requires Lingo and a valid license key. Please refer to the [Lingo 
 
 ## Installation For LINGO 20
 
-This python package can be installed with pip. It is assumed Lingo 20 is installed on host system.
+This python package can be installed with pip. It is assumed Lingo 21 is installed on host system.
 
 For administrative users: 
 
@@ -18,20 +18,20 @@ For standard (non-administrative) users:
 > pip install lingo_api --user
 ```
 
-## Installation For LINGO 19
+## Installation For LINGO 20
 
-This python package can be installed with pip. It is assumed Lingo 19 is installed on host system.
+This python package can be installed with pip. It is assumed Lingo 20 is installed on host system.
 
 For administrative users: 
 
 ```bash
-> pip install lingo_api==19.0.6
+> pip install lingo_api==20.0.9
 ```
 
 For standard (non-administrative) users:
 
 ```bash
-> pip install lingo_api==19.0.6 --user
+> pip install lingo_api==20.0.9 --user
 ```
 
 
@@ -59,6 +59,16 @@ To fix the problem follow these steps
 ### Using Windows
 On the command line depending on the users LINGO installation:
 
+LINGO 21 on windows 64-bit  
+```dos
+> setx LINGO64_20_HOME "C:\path\to\LINGO64_21" 
+```
+LINGO 21 on windows 32-bit 
+```dos
+> setx LINGO_21_HOME "C:\path\to\LINGO21" 
+```
+
+
 LINGO 20 on windows 64-bit  
 ```dos
 > setx LINGO64_20_HOME "C:\path\to\LINGO64_20" 
@@ -69,17 +79,18 @@ LINGO 20 on windows 32-bit
 ```
 
 
-LINGO 19 on windows 64-bit 
-```dos
-> setx LINGO64_19_HOME "C:\path\to\LINGO64_19"
-```
-LINGO 19 on windows 32-bit  
-```dos
-> setx LINGO_19_HOME "C:\path\to\LINGO19"
-```
-
 ### Using Linux
 On the command line depending on the users LINGO installation:
+
+LINGO 21
+For administrative users:
+```    
+$ export LINGO64_21_HOME="/opt/lingo21"	
+```    
+For standard (non-administrative) users:
+```    
+$ export LINGO64_21_HOME="~/lingo21"	
+```   
 
 LINGO 20
 For administrative users:
@@ -91,14 +102,6 @@ For standard (non-administrative) users:
 $ export LINGO64_20_HOME="~/lingo20"	
 ```   
 
-LINGO 19
-```    
-$ export LINGO64_19_HOME="/opt/lingo19"	
-```    
-For standard (non-administrative) users:
-```    
-$ export LINGO64_19_HOME="~/lingo19"	
-```   
 
 
 To have this variable set automatically, add the above line to the `~/.bashrc` or `~/.bash_profile` file.
