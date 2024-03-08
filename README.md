@@ -61,7 +61,7 @@ On the command line depending on the users LINGO installation:
 
 LINGO 21 on windows 64-bit  
 ```dos
-> setx LINGO64_20_HOME "C:\path\to\LINGO64_21" 
+> setx LINGO64_21_HOME "C:\path\to\LINGO64_21" 
 ```
 LINGO 21 on windows 32-bit 
 ```dos
