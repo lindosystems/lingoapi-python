@@ -2,7 +2,7 @@
 
 This package requires Lingo and a valid license key. Please refer to the [Lingo user manual](https://lindo.com/downloads/PDF/LINGO.pdf) for installation instructions, and to learn more about the Lingo modeling language.
 
-## Installation For LINGO 20
+## Installation For LINGO 21
 
 This python package can be installed with pip. It is assumed Lingo 21 is installed on host system.
 
