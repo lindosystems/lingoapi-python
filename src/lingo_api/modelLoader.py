@@ -19,6 +19,7 @@ class Model():
 
         self._pointerDict = {}
         self._changedDict = {}
+        self._dimDict = {}
 
     def get_lngFile(self):
         """get_lngFile returns lngFile"""
@@ -151,8 +152,10 @@ def solve(lm:Model):
         
         # Make sure all Arrays are flat
         if pointer.ndim > 1:
+            lm._dimDict[key] = pointer.shape
             pointer = pointer.flatten()
-            lm.set_pointer(key, pointer, ptrType) # try without this line too...
+            lm.set_pointer(key, pointer, ptrType)
+            foo, fooType = lm.get_pointer(key)
 
         # set Sets as "|S" type
         if ptrType == SET:
@@ -203,6 +206,7 @@ def solve(lm:Model):
     return 0
 
 def _resetChanges(lm:Model):
+    # loop over dtype changes to reset them
     for key, t in lm._changedDict.items():
         pointer, ptrType = lm.get_pointer(key)
         if t == float:
@@ -212,5 +216,9 @@ def _resetChanges(lm:Model):
         else:
             lm.set_pointer(key, pointer.astype(t), ptrType) # if it is some casted numpy type
 
-            
-            
+    # loop over flattened arrays to reshape them back to original
+    for key, s in lm._dimDict.items():        
+        pointer, ptrType = lm.get_pointer(key)
+        if(ptrType == VAR):
+            pointer = np.reshape(pointer,s, order='C') 
+            lm.set_pointer(key, pointer, ptrType)

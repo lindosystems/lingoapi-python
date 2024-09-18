@@ -1,12 +1,12 @@
 #include "Python.h"
-#include "arrayobject.h"
+#include <numpy/arrayobject.h>
 #include "stdlib.h"
 #include "stdbool.h"
 #include "stdio.h"
 #include "lingd21.h"
 #include "string.h"
 
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#define NPY_NO_DEPRECATED_API NPY_1_20_API_VERSION 
 
 struct module_state {
     PyObject *error;

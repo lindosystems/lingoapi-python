@@ -5,8 +5,8 @@ from distutils.sysconfig import get_python_lib
 import os
 import sys
 import platform
-
-VERSION = "21.0.7"
+import numpy
+VERSION = "21.0.8"
 
 class BuildData():
     """
@@ -70,7 +70,7 @@ if bd.platform == 'Linux':
 extension_kwargs = {
                     "name" : "lingo_api.lingo",
                     "sources" : ["src/lingo_api/pyLingo.c"],
-                    "include_dirs" : [IncludePath, numpyinclude],
+                    "include_dirs" : [IncludePath, numpy.get_include()],
                     "library_dirs" : [LibPath],
                     "libraries" : [LingoLib],
                     "depends":[LibPath],
@@ -97,7 +97,7 @@ setup_kwargs = {"name" : 'lingo-api',
                 "python_requires": ">=3.7",
                 "platforms" : ['Windows, Linux'],
                 "ext_modules" : [lingomodule],
-                "install_requires": ["numpy>=1.19"],
+                "install_requires": ["numpy>=1.9"],
                 "package_dir": {"": "src"},
                 "packages" : ['lingo_api', 'lingo_test'],
                 "package_data" : {'lingo_api': ['*.txt', 'pyLingo.c']},}
