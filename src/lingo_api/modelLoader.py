@@ -4,6 +4,7 @@ from .const           import *
 from .lingoExceptions import *
 from .lingo           import *
 import numpy as np
+import pandas as pd
 
 class Model():
 
@@ -135,6 +136,10 @@ def solve(lm:Model):
         pointer = tuple[0]
         ptrType = tuple[1]
 
+        # convert pandas dataframes to np array
+        if isinstance(pointer, pd.DataFrame) or isinstance(pointer, pd.core.indexes.base.Index):
+            pointer = pointer.to_numpy()
+            lm.set_pointer(key, pointer, ptrType)
 
         # set Param and Vars as np.double
         # except arrays and singletons
@@ -150,13 +155,6 @@ def solve(lm:Model):
         if len(pointer) == 0:
             raise EmptyPointer(key)
         
-        # Make sure all Arrays are flat
-        if pointer.ndim > 1:
-            lm._dimDict[key] = pointer.shape
-            pointer = pointer.flatten()
-            lm.set_pointer(key, pointer, ptrType)
-            foo, fooType = lm.get_pointer(key)
-
         # set Sets as "|S" type
         if ptrType == SET:
             tempPointerArrstr = ""
@@ -174,12 +172,20 @@ def solve(lm:Model):
                 lm._changedDict[key] = pointer.dtype
                 pointer = pointer.astype(np.double)
                 lm.set_pointer(key, pointer, ptrType)
+
+            lm._dimDict[key] = pointer.shape
+            pointer = pointer.ravel()
+            lm.set_pointer(key, pointer, ptrType) 
+
             errorcode = pyLSsetDouPointerLng(pEnv, pointer, pnPointersNow)
             if errorcode != LSERR_NO_ERROR_LNG:
                 raise LingoError(errorcode)
         else:
             raise PointerTypeNotSupportedError(ptrType)
-          
+        
+
+
+
 
     #Run the script
     cScript = "SET ECHOIN 1 \n TAKE "+lm.lngFile+" \n GO \n QUIT \n"
@@ -206,9 +212,23 @@ def solve(lm:Model):
     return 0
 
 def _resetChanges(lm:Model):
+    # loop over flattened arrays to reshape them back to original
+    for key, s in lm._dimDict.items(): 
+        pointer, ptrType = lm.get_pointer(key)
+        #print(f"{key}    {pointer.shape} != {s}")
+        if pointer.shape != s:    
+            pointer = np.reshape(pointer,s, order='C') 
+            lm.set_pointer(key, pointer, ptrType)
+
     # loop over dtype changes to reset them
     for key, t in lm._changedDict.items():
+
         pointer, ptrType = lm.get_pointer(key)
+        #print(f"_changedDict   {key}    {pointer.shape}")
+
+        if pointer.size != 1:
+            continue
+
         if t == float:
             lm.set_pointer(key, pointer[0], ptrType)
         elif t == int:
@@ -216,9 +236,3 @@ def _resetChanges(lm:Model):
         else:
             lm.set_pointer(key, pointer.astype(t), ptrType) # if it is some casted numpy type
 
-    # loop over flattened arrays to reshape them back to original
-    for key, s in lm._dimDict.items():        
-        pointer, ptrType = lm.get_pointer(key)
-        if(ptrType == VAR):
-            pointer = np.reshape(pointer,s, order='C') 
-            lm.set_pointer(key, pointer, ptrType)

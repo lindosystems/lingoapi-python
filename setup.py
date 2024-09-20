@@ -6,7 +6,7 @@ import os
 import sys
 import platform
 import numpy
-VERSION = "21.0.8"
+VERSION = "21.0.9"
 
 class BuildData():
     """
@@ -97,7 +97,7 @@ setup_kwargs = {"name" : 'lingo-api',
                 "python_requires": ">=3.7",
                 "platforms" : ['Windows, Linux'],
                 "ext_modules" : [lingomodule],
-                "install_requires": ["numpy>=1.9"],
+                "install_requires": ["numpy>=1.9", "pandas"],
                 "package_dir": {"": "src"},
                 "packages" : ['lingo_api', 'lingo_test'],
                 "package_data" : {'lingo_api': ['*.txt', 'pyLingo.c']},}
