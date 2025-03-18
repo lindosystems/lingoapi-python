@@ -1,3 +1,4 @@
+#define NPY_NO_DEPRECATED_API NPY_1_20_API_VERSION 
 #include "Python.h"
 #include <numpy/arrayobject.h>
 #include "stdlib.h"
@@ -6,7 +7,7 @@
 #include "lingd21.h"
 #include "string.h"
 
-#define NPY_NO_DEPRECATED_API NPY_1_20_API_VERSION 
+
 
 struct module_state {
     PyObject *error;
@@ -191,11 +192,11 @@ PyObject *pyLScreateEnvLicenseLng(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    if(pyErrorCode && pyErrorCode->dimensions > 0)
-        pnErrorCode = (int *)PyArray_GetPtr(pyErrorCode,index);
+    if(pyErrorCode && PyArray_NDIM(pyErrorCode) > 0)
+        pnErrorCode = (int *)PyArray_DATA(pyErrorCode);
 
     if(pyLicenseKey)
-        pachLicenseKey = (char *)pyLicenseKey->data;
+        pachLicenseKey = (char *)PyArray_DATA(pyLicenseKey);
 
     pEnv = LScreateEnvLicenseLng(pachLicenseKey, &nErrLng);
 
@@ -353,11 +354,11 @@ PyObject *pyLSsetIntPointerLng(PyObject *self, PyObject *args)
 
     CHECK_ENV;
 
-    if(pyPointer && pyPointer->dimensions > 0)
-        pnPointer = (int *)PyArray_GetPtr(pyPointer,index);
+    if(pyPointer && PyArray_NDIM(pyPointer) > 0)
+        pnPointer = (int *)PyArray_DATA(pyPointer);
 
-    if(pyPointersNow && pyPointersNow->dimensions > 0)
-        pnPointersNow = (int *)PyArray_GetPtr(pyPointersNow,index);
+    if(pyPointersNow && PyArray_NDIM(pyPointersNow) > 0)
+        pnPointersNow = (int *)PyArray_DATA(pyPointersNow);
 
     nErrLng = LSsetPointerLng(pEnv, pnPointer, pnPointersNow);
 
@@ -385,11 +386,11 @@ PyObject *pyLSsetDouPointerLng(PyObject *self, PyObject *args)
     }
 
     CHECK_ENV;
-    if(pyPointer && pyPointer->dimensions > 0)
-        pdPointer = (double *)PyArray_GetPtr(pyPointer,index);   
+    if(pyPointer && PyArray_NDIM(pyPointer) > 0)
+        pdPointer = (double *)PyArray_DATA(pyPointer);   
 
-    if(pyPointersNow && pyPointersNow->dimensions > 0)
-        pnPointersNow = (int *)PyArray_GetPtr(pyPointersNow,index);
+    if(pyPointersNow && PyArray_NDIM(pyPointersNow) > 0)
+        pnPointersNow = (int *)PyArray_DATA(pyPointersNow);
 
     nErrLng = LSsetPointerLng(pEnv, pdPointer, pnPointersNow); 
 
@@ -418,13 +419,18 @@ PyObject *pyLSsetCharPointerLng(PyObject *self, PyObject *args)
 
     CHECK_ENV;
 
-    if(pyPointer && pyPointer->dimensions > 0)
-        paPointer = (char *)PyArray_GetPtr(pyPointer,index);
+    if(pyPointer && PyArray_NDIM(pyPointer) > 0)
+        paPointer = (char *)PyArray_DATA(pyPointer);
 
-    if(pyPointersNow && pyPointersNow->dimensions > 0)
-        pnPointersNow = (int *)PyArray_GetPtr(pyPointersNow,index);
+
+
+
+    if(pyPointersNow && PyArray_NDIM(pyPointersNow) > 0)
+        pnPointersNow = (int *)PyArray_DATA(pyPointersNow);
 
     nErrLng = LSsetPointerLng(pEnv, paPointer, pnPointersNow);
+    printf("nErrLng: %d  PaPointer:\n %s",nErrLng, paPointer);
+
 
     return Py_BuildValue("i",nErrLng); 
 }
@@ -443,7 +449,7 @@ int CALLTYPE relayCallbackSolver(pLSenvLINGO pL, int nReserved, void *pUserData)
         arglist = Py_BuildValue("(OiO)", cbpyEnv, nReserved, cbuData);
         // ...for calling the Python cb function
         if (arglist)
-            result = PyEval_CallObject(cbSolver, arglist);
+            result = PyObject_CallObject(cbSolver, arglist);
     }
     if (result && PyLong_Check(result)) 
     {
@@ -507,7 +513,7 @@ void CALLTYPE relayCallbackError(pLSenvLINGO pL, void *pUserData, int nErrorCode
         arglist = Py_BuildValue("(OOis)", cbpyEnv, cbuData, nErrorCode, pcErrorText);
         // ...for calling the Python cb function
         if (arglist)
-            result = PyEval_CallObject(cbError, arglist);
+            result = PyObject_CallObject(cbError, arglist);
     }
     if(PyErr_Occurred()){
         cbError_set = true;
@@ -583,8 +589,8 @@ PyObject *pyLSgetDouCallbackInfoLng(PyObject *self, PyObject *args)
 
     CHECK_ENV;
 
-    if(pyResults && pyResults->dimensions > 0)
-        pdResults = (void *)PyArray_GetPtr(pyResults,index);   
+    if(pyResults && PyArray_NDIM(pyResults) > 0)
+        pdResults = (void *)PyArray_DATA(pyResults);   
 
      nErrLng = LSgetCallbackInfoLng(pEnv, nObject, pdResults);
 
@@ -614,8 +620,8 @@ PyObject *pyLSgetIntCallbackInfoLng(PyObject *self, PyObject *args)
 
     CHECK_ENV;
 
-    if(pyResults && pyResults->dimensions > 0)
-        piResults = (void *)PyArray_GetPtr(pyResults,index);   
+    if(pyResults && PyArray_NDIM(pyResults) > 0)
+        piResults = (void *)PyArray_DATA(pyResults);   
 
      nErrLng = LSgetCallbackInfoLng(pEnv, nObject, piResults);
 
@@ -649,11 +655,11 @@ PyObject *pyLSgetIntCallbackInfoLng(PyObject *self, PyObject *args)
 
     CHECK_ENV;
 
-    if(pyCharPointer && pyCharPointer->dimensions > 0)
-        paPointer = (char *)PyArray_GetPtr(pyCharPointer,index);   
+    if(pyCharPointer && PyArray_NDIM(pyCharPointer) > 0)
+        paPointer = (char *)PyArray_DATA(pyCharPointer);   
 
-    if(pyDouPointer && pyDouPointer->dimensions > 0)
-        pdPointer = (double *)PyArray_GetPtr(pyDouPointer,index);   
+    if(pyDouPointer && PyArray_NDIM(pyDouPointer) > 0)
+        pdPointer = (double *)PyArray_DATA(pyDouPointer);   
 
 
      nErrLng = LSgetCallbackVarPrimalLng(pEnv, paPointer, pdPointer);

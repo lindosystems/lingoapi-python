@@ -21,7 +21,7 @@ class TypeNotSupportedError(lingoException):
     """
     def __init__(self, error):
         self.error = error
-        self.message = "Unsupported type\nExcepted For VAR/PARAM: NumPy array of numbers, Int, floats\nExcepted For       SET: NumPy array of String or Int"
+        self.message = "Unsupported type\nExcepted For VAR/PARAM: NumPy array or Pandas data frame of numbers, Int orfloats\nExcepted For       SET: NumPy array or Pandas data frame of String or Int"
         super().__init__(self.error, self.message)  
 
 class PointerTypeNotSupportedError(lingoException):

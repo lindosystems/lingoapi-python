@@ -160,10 +160,16 @@ def solve(lm:Model):
             tempPointerArrstr = ""
             for i in range(0,len(pointer)):
                 tempPointerArrstr+=f"{str(pointer[i])}\n"
+            # if tempPointerArrstr ends with a newline remove it
+            if tempPointerArrstr[-1] == "\n":
+                tempPointerArrstr = tempPointerArrstr[:-1]
+            # add null terminator
+            tempPointerArrstr += "\0"
             tempPointerArr = np.array([tempPointerArrstr])
-            byteSize = 2*len(tempPointerArr[0]) #<- doubling the len to determin the byte size for the np array
-            tempPointerArr = tempPointerArr.astype(f"|S{byteSize}")
+            byteSize = 2*len(tempPointerArrstr) #<- doubling the len to determin the byte size for the np array
+            tempPointerArr = tempPointerArr.astype(f"S{byteSize}")
             errorcode = pyLSsetCharPointerLng(pEnv, tempPointerArr, pnPointersNow)
+            #print(f"errorcode: {errorcode}    tmpPointerArr: {tempPointerArr}   pnPointersNow: {pnPointersNow}")
             if errorcode != LSERR_NO_ERROR_LNG:
                 raise LingoError(errorcode)
 
@@ -186,9 +192,12 @@ def solve(lm:Model):
 
 
 
-
+    #Read in LINGO script 
+    with open(lm.lngFile, 'r') as LINGOfile:
+        LINGOfileText = LINGOfile.read()
+    LINGOfileText = LINGOfileText.replace('\x00', '')
     #Run the script
-    cScript = "SET ECHOIN 1 \n TAKE "+lm.lngFile+" \n GO \n QUIT \n"
+    cScript = "SET ECHOIN 1 \n MODEL: \n"+LINGOfileText+" \n GO \n QUIT \n"
     errorcode = pyLSexecuteScriptLng(pEnv, cScript)
     if errorcode != LSERR_NO_ERROR_LNG:
         errorcode2 = pyLScloseLogFileLng(pEnv)
