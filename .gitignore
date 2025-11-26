@@ -35,3 +35,8 @@ MANIFEST
 
 # notebook 
 .ipynb_checkpoints
+
+*.txt
+*.log
+*.zip
+*.bat
