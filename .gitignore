@@ -40,3 +40,4 @@ MANIFEST
 *.log
 *.zip
 *.bat
+Dockerfile
