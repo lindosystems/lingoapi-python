@@ -42,3 +42,4 @@ MANIFEST
 *.bat
 Dockerfile
 
+.vscode/
