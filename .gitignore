@@ -41,5 +41,5 @@ MANIFEST
 *.zip
 *.bat
 Dockerfile
-
+.pypirc
 .vscode/
