@@ -41,6 +41,4 @@ MANIFEST
 *.zip
 *.bat
 Dockerfile
-window_build.bat
-*.bat
-window_build.bat
+
