@@ -10,7 +10,7 @@ import platform
 
 
 
-VERSION = "22.0.00"
+VERSION = "22.0.1"
 
 class BuildData():
     """
@@ -22,7 +22,7 @@ class BuildData():
     """
     def __init__(self):
         self.MAJOR = "22"
-        self.MINOR = "0"
+        self.MINOR = "1"
         self.LINGO_HOME = os.environ.get('LINGO_22_HOME')
         self.LINGO64_HOME = os.environ.get('LINGO64_22_HOME')
         self.platform = platform.system()
