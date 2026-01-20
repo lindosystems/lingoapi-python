@@ -81,7 +81,7 @@ model.set_uData(uData)
 # now that everything is set call solve(model)
 lingo.solve(model)
 # get STATUS since it is not an NumPy array
-# it need to retrived from model
+# it needs to retrived from model
 STATUS, ptrType  = model.get_pointer("Pointer7")
 
 # check that the model has ben solved
