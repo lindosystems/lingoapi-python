@@ -1,0 +1,107 @@
+! Flow Shop Scheduling with Change_Over Times
+ In a flow shop, each job gets processed once, in order, on machines: 1, 2, 3, ...
+  There is changeover, e.g., cleaning, time between successive jobs on a machine.
+  The objective is to minimize the maximum finish time of any job;
+
+! Keywords: @OLE, Changeovers,  Flowshop, LINGO, Scheduling, Sequencing, Setups;
+Model:
+SETS:
+  JOB;
+  MACHINE;
+  MxJ( MACHINE, JOB): DURN, STIME;
+  MxJxJ( MACHINE, JOB, JOB): ChngTm, ZPred;
+ENDSETS
+DATA:
+!LNG JOB = A1 A2 A3 B1 B2 B3
+ LNG MACHINE = Blend  Tablet
+ Duration of each job (col) on each machine( row);
+!LNG  DURN =
+   2 2 2 2 2 2
+   3 3 3 3 3 3;
+
+! Changeover times, machine, predecessor job, successor job;
+!LNG ChngTm =
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+   1 1 1 2 2 2
+   1 1 1 1 1 1
+   1 1 1 1 1 1
+   1 1 1 1 1 1;
+
+!XL JOB     = @OLE();
+!XL MACHINE = @OLE();
+!XL DURN    = @OLE();
+!XL ChngTm  = @OLE();
+
+!API; JOB     = @POINTER( 1);
+!API; MACHINE = @POINTER( 2);
+!API; DURN    = @POINTER( 3);
+!API; ChngTm  = @POINTER( 4);
+
+
+ENDDATA
+
+SUBMODEL FloSched:
+! Zpred( m, i, j) = 1 if job i precedes j on machine m,  
+  Zpred( m, i, j) = 1 if i is first job on machine m,   
+  STime( m, j) Start time on machine m of job j         ;
+
+  ULSTIME = 99; ! Upper limit on difference in two start times,  
+                    for speed, should be small as valid         ;
+  NMAch = @SIze( MACHINE);
+ ! Minimize the maximum finish time;
+ MIN = FinMax;
+  @FOR( JOB( j):
+    FinMax >= Stime( NMach, j) + Durn( Nmach, j);
+      );
+! Job j cannot start earlier on machine m than its finish time on m-1;
+@FOR( MxJ( m, j) | m #GT# 1:
+   STIME( m, j) >= STIME( m-1, j) + DURN( m-1, j);
+    );
+
+@FOR( MxJ( m, j):
+! Job j must be preceded by some job i on machine m;
+  @SUM( JOB( i): ZPred( m, i, j)) = 1;
+! Job j has at most one successor on machine m;
+  @SUM( JOB( i) | i #NE# j: ZPred( m, j, i)) <= 1;
+
+! Earliest start of j on machine m is >= start of predecessor job i,    
+   + its duration  + changeover time from i to j; 
+  @FOR( JOB( i) | i #NE# j:
+    STime( m, j) >= STime( m, i) + ( Durn( m, i) + Chngtm( m, i, j) )* ZPred( m, i, j)
+                                                      - ULSTime *( 1 - Zpred( m, i, j ))
+      );
+    );
+
+! There is exactly one first job on each machine;
+ @FOR( MACHINE( m):
+   @SUM( JOB( j): ZPred( m, j, j)) = 1;
+     );
+
+ ! The ZPRED must be binary ( 0 or 1);
+ @FOR( MxJxJ( m, i, j): @BIN( ZPred( m, i, j)));
+ENDSUBMODEL
+
+CALC:
+  @SOLVE( FloSCHED);
+
+! Send the Start times of each job on each machine back to the spreadsheet;
+!XL @OLE() = STIME;
+!XL @OLE() = ZPRED;
+
+!API; @POINTER(5) = STIME;
+!API; @POINTER(6) = ZPRED;
+!API; @POINTER(7) = @STATUS();
+
+ENDCALC
+
+End
+
+

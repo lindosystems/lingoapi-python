@@ -13,10 +13,10 @@ class BuildData():
 
     """
     def __init__(self):
-        self.MAJOR = "21"
+        self.MAJOR = "22"
         self.MINOR = "0"
-        self.LINGO_HOME = os.environ.get('LINGO_21_HOME')
-        self.LINGO64_HOME = os.environ.get('LINGO64_21_HOME')
+        self.LINGO_HOME = os.environ.get('LINGO_22_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_22_HOME')
         self.platform = platform.system()
         self.is_64bits = sys.maxsize > 2**32
         self.pyMajor = sys.version_info[0]
@@ -75,10 +75,10 @@ def main():
     ## print(bd) # If Debug
     #Environment variable LINDOAPI_HOME must be set
     if bd.LINGO_HOME == None and bd.is_64bits == False:
-        raise NoEviromentVar("LINGO_21_HOME", "Lingo21")
+        raise NoEviromentVar("LINGO_22_HOME", "Lingo22")
 
     if bd.LINGO64_HOME == None and bd.is_64bits:
-        raise NoEviromentVar("LINGO64_21_HOME", "Lingo64_21")
+        raise NoEviromentVar("LINGO64_22_HOME", "Lingo64_22")
 
     if bd.platform == 'Windows' or bd.platform == "CYGWIN_NT-6.3":
         windows(bd)

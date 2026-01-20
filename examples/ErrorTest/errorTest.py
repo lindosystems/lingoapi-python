@@ -121,6 +121,15 @@ def emptyPointerModel(lngFile):
     return model
 
 """
+This model is set to a LNG file that does not exist
+"""
+def dneModel():
+    lngFile = "DNE.lng"
+    # Create a model object
+    model = lingo.Model(lngFile)
+    return model
+
+"""
 run(model) prints the model then it calls solve wrapped in a try/except block.
 """
 def run(model):  
@@ -177,3 +186,7 @@ model = emptyPointerModel(lngFile)
 run(model)
 print("\n","*"*60,"\n")
 
+print("Testing a model that does not exist: \n")
+model = dneModel()
+run(model)
+print("\n","*"*60,"\n")

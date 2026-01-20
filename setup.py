@@ -5,8 +5,12 @@ from distutils.sysconfig import get_python_lib
 import os
 import sys
 import platform
-import numpy
-VERSION = "21.0.9"
+
+
+
+
+
+VERSION = "22.0.00"
 
 class BuildData():
     """
@@ -17,25 +21,27 @@ class BuildData():
 
     """
     def __init__(self):
-        self.MAJOR = "21"
+        self.MAJOR = "22"
         self.MINOR = "0"
-        self.LINGO_HOME = os.environ.get('LINGO_21_HOME')
-        self.LINGO64_HOME = os.environ.get('LINGO64_21_HOME')
+        self.LINGO_HOME = os.environ.get('LINGO_22_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_22_HOME')
         self.platform = platform.system()
         self.is_64bits = sys.maxsize > 2**32
 
 bd = BuildData()
 
-try:
-    import numpy
-except Exception:
-    print('\nWarning: numpy was not found, installing...\n')
-    import subprocess
-    subprocess.call([sys.executable, "-m", "pip", "install", "numpy"])
+def get_numpy_include():
+    try:
+        import numpy
+        return numpy.get_include()
+    except ImportError:
+        print('\nWarning: numpy was not found, installing...\n')
+        import subprocess
+        subprocess.call([sys.executable, "-m", "pip", "install", "numpy"])
+        import numpy
+        return numpy.get_include()
 
-# include the numpy library
-numpyinclude = os.path.join(get_python_lib(
-      plat_specific=True), 'numpy/core/include/numpy')
+numpyinclude = get_numpy_include()
 
 # Gets the long description from README FILE
 setupDir = os.path.dirname(__file__)
@@ -70,7 +76,7 @@ if bd.platform == 'Linux':
 extension_kwargs = {
                     "name" : "lingo_api.lingo",
                     "sources" : ["src/lingo_api/pyLingo.c"],
-                    "include_dirs" : [IncludePath, numpy.get_include()],
+                    "include_dirs" : [IncludePath, numpyinclude],
                     "library_dirs" : [LibPath],
                     "libraries" : [LingoLib],
                     "depends":[LibPath],
@@ -97,7 +103,7 @@ setup_kwargs = {"name" : 'lingo-api',
                 "python_requires": ">=3.7",
                 "platforms" : ['Windows, Linux'],
                 "ext_modules" : [lingomodule],
-                "install_requires": ["numpy>=1.9", "pandas"],
+                "install_requires": ["numpy", "pandas"],
                 "package_dir": {"": "src"},
                 "packages" : ['lingo_api', 'lingo_test'],
                 "package_data" : {'lingo_api': ['*.txt', 'pyLingo.c']},}

@@ -41,16 +41,6 @@ CALC:
     FINAL = -1;
     BIGM    = 999;
     ! SET COSTS;
-    @SET('ITRLIM',  0); !Iteration limit (0:no limit). Default:0;
-    @SET('LINLEN',  800); !Terminal page width (0:none). Default:85;
-    @SET('TERSEO',  3); !Output level (0:verbose, 1:terse, 2:errors only, 3:no output). Default:0;
-    @SET('MXMEMB',  128); !Memory limit in megabytes for LINGO’s model generator (N/A on some machines). Default:32;
-    @SET('DUALCO',  1); !Specify dual computations (0:none, 1:prices only, 2:prices and ranges, 3:prices only on optimizable rows). Default:1;
-    @SET('SCALEM',  1); !Scale the model (1:yes, 0:no) Command-Line Commands 381. Default:1;
-    @SET('TIM2RL',  30); !Seconds before switching to IP relative optimality tolerance. Default:100;
-    @SET('IPTOLR',  0.5); !IP relative optimality tolerance. Default:0.1e-4;
-    @SET('TIMLIM',  0); !Solver time limit in seconds (0:no limit). Default:0;
-    @SET('ECHOIN',  0); !Echo command input to terminal (1:yes, 0:no). Default:0;
     COST( 1) = BIGM;
     @FOR( PATTERN( J) | J #GT# 1: COST( J) = 1);
     ! SUPER PATTERN;

@@ -1,0 +1,56 @@
+MODEL:
+! A generic transportation Problem;
+! Keywords: Transportation model;
+SETS:
+! The SETS section describes the general data structure;
+   SUPPLIER : CAPACITY; ! Each supplier has a capacity;
+   CUSTOMER : DEMAND;   ! Each customer has a demand;
+! A combination of supplier/customer has a 
+     cost/unit shipped and amount shipped;
+   LINK( SUPPLIER, CUSTOMER): COST, FLO;
+ENDSETS
+! Here are the data for a specific instance;
+DATA:
+   SUPPLIER = @POINTER(1);
+   CAPACITY = @POINTER(2);
+   CUSTOMER = @POINTER(3);
+   DEMAND = @POINTER(4);
+   COST = @POINTER(5);
+ ! You can get the data from and store results
+  to a spreadsheet with the @OLE() statement,
+  or a SQL database with the @ODBC() statement;
+ENDDATA
+
+SUBMODEL SHIPSTUFF:
+! The objective;
+   MIN = @SUM( LINK( I, J): 
+                    COST( I, J) * FLO( I, J));
+
+! The capacity constraints. FLO shipped out of I
+   must be <= supply at I;
+   @FOR( SUPPLIER( I): 
+ [CAPCON]   @SUM( LINK( I, J): FLO( I, J)) <= 
+     CAPACITY( I));
+
+! The demand constraints. FLO shipped into J
+   must equal demand at J;
+   @FOR( CUSTOMER( J): 
+ [DEMCON]   @SUM( LINK( I, J): FLO( I, J)) = DEMAND( J);
+       );
+ENDSUBMODEL
+
+CALC:
+
+   @SOLVE( SHIPSTUFF);
+
+   TransCost = @SUM( LINK( I, J): 
+                    COST( I, J) * FLO( I, J));
+
+   @POINTER(6) = FLO;
+   @POINTER(7) = TransCost;
+   @POINTER(8) = @STATUS();
+   
+ENDCALC  
+
+END
+

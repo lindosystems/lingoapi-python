@@ -81,7 +81,7 @@ lngFile = "loopCut.lng"
 FG = np.array(["F34","F24","F15","F10","F18"])
 WIDTH = np.array([34, 24, 15, 10, 18])
 DEM = np.array([350, 100, 800, 1001, 377])
-NPATTERNS = 20
+NPATTERNS = 200
 RMWIDTH = 45
 NFG = len(FG)
 

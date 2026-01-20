@@ -115,25 +115,35 @@ class LoadException():
         elif self.platform == 'Windows' or self.platform == "CYGWIN_NT-6.3":
             msg = "Lingo Import Error:                                                          \n\
                         Make sure all the following files are present in "+ self.LINGO_HOME  +":\n\
-                        Chartdir60.dll                                                          \n\
-                        Cilkrts20.dll                                                           \n\
-                        Conopt3.dll                                                             \n\
-                        Conopt4.dll                                                             \n\
-                        Libifcoremd.dll                                                         \n\
-                        Libiomp5md.dll                                                          \n\
-                        Libmmd.dll                                                              \n\
-                        Lindo14_0.dll                                                           \n\
-                        Lindocu_19.dll                                                           \n\
-                        Lindopr11.dll                                                           \n\
-                        Lingd21.dll                                                            \n\
-                        Lingdb21.dll                                                            \n\
-                        Lingf21.dll                                                            \n\
-                        Lingfd21.dll                                                           \n\
-                        Lingj21.dll                                                            \n\
-                        Lingr_1.dll                                                             \n\
-                        Lingxl5.dll                                                            \n\
-                        Mosek9_2.dll                                                           \n\
-                        Msvcr120.dll                                                            \n\
+                        Chartdir60.dll \n\
+                        Libifcoremd.dll   \n\
+                        Lindopr64_11.dll   \n\
+                        Lingxl64_5.dll     \n\
+                        highs.dll          \n\
+                        lingd64_22.dll     \n\
+                        Conopt3.dll       \n\
+                        Libifportmd.dll   \n\
+                        Lingdb64_3.dll    \n\
+                        Lingxl64_6.dll    \n\
+                        liblindoexpr.dll  \n\
+                        mosek64_11_0.dll  \n\
+                        Conopt464.dll     \n\
+                        Libiomp5md.dll    \n\
+                        Lingf64_22.dll    \n\
+                        Svml_dispmd.dll   \n\
+                        liblindohighs.dll  \n\
+                        parser.dll        \n\
+                        IpOptFSS.dll      \n\
+                        Libmmd.dll       \n\
+                        Lingfd64_22.dll   \n\
+                        Tbb12.dll        \n\
+                        liblindoosi.dll  \n\
+                        tree-sitter.dll  \n\
+                        Ipopt311.dll     \n\
+                        LindoCU_19x64.dll  \n\
+                        Lingr64_1.dll     \n\
+                        VCruntime140.dll  \n\
+                        lindo64_16_0.dll    \n\
                     "
 
         else:

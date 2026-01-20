@@ -1,0 +1,81 @@
+MODEL: 
+! Standard Markowitz portfolio model (PORTCardCor);
+! Markowitz portfolio model with a constraint on number of assets in portfolio;
+! Keywords: cardinality constrained, portfolio, Markowitz portfolio;
+ SETS:
+  STOCK:  EXPRET, STDDEV, AMNT, INCLD;
+  COVMAT( STOCK, STOCK) |&1 #LE# &2: CORR;
+ ENDSETS
+
+! Minimize portfolio variance, with a 2 applied when I < J;
+[RISK] MIN = PVAR; 
+   PVAR = @SUM( STOCK( I): AMNT( I) * AMNT( I) * STDDEV(I)^2)
+      +  2 * @SUM( COVMAT( I, J)| I #LT# J:
+                  AMNT( I) * AMNT( J) * STDDEV(I)*STDDEV(j)*CORR( I, J));
+
+! Use exactly 100% of the starting budget;
+[BUDGET] @SUM( STOCK: AMNT) = 1;
+
+! Required return at end of period;
+[RETURN] @SUM( STOCK: AMNT * EXPRET) > TARGET;
+
+! Cardinality constraints;
+ @FOR( STOCK( I):
+   @BIN( INCLD( I)); ! INCLD(i) is binary, i.e., 0 or 1;
+   AMNT( I) <= INCLD( I); ! If AMT(I) > 0, then INCLD(i) = 1;
+     );
+! Limit on number of stocks at positive level;
+  @SUM( STOCK( I): INCLD( I)) <= CARD;
+
+DATA:
+
+! Input from API;
+!API; STOCK  = @POINTER( 1); ! Stock Names;
+!API; CARD   = @POINTER( 2); ! Number of diffrent stock names in the portfolio;
+!API; TARGET = @POINTER( 3); ! Target retrun;
+!API; EXPRET = @POINTER( 4); ! Expected return;
+!API; STDDEV = @POINTER( 5); ! Standard deviation;
+!API; CORR   = @POINTER( 6); ! Upper diagonal of the correlation Matrix;
+ 
+!API; @POINTER( 7)  = AMNT;        ! Percentage of final portfolio in each asset;
+!API; @POINTER( 8)  = INCLD;       ! The binary decision of adding an asset to the portfolio;
+!API; @POINTER( 9)  = PVAR;        ! Portfolio variance;
+!API; @POINTER( 10) = @STATUS();   ! model status;
+
+! Input from Excel;
+!XCL STOCK  = @OLE(); ! Stock Names;
+!XCL CARD   = @OLE(); ! Number of diffrent stock names in the portfolio;
+!XCL TARGET = @OLE(); ! Target retrun;
+!XCL EXPRET = @OLE(); ! Expected return;
+!XCL STDDEV = @OLE(); ! Standard deviation;
+!XCL CORR   = @OLE(); ! Upper diagonal of the correlation Matrix;
+ 
+!XCL @OLE() = AMNT;       ! Percentage of final portfolio in each asset;
+!XCL @OLE() = INCLD;      ! The binary decision of adding an asset to the portfolio;
+!XCL @OLE() = PVAR;       ! Portfolio variance;
+!XCL @OLE() = @STATUS();  ! model status;
+
+!  Hard coded input;
+!HRD STOCK   = Alcoa Ford Deere Dupont PandG Chevron 3M USsteel Mcrsft; ! Stock Names;
+!HRD  CARD    = 4;
+!HRD  TARGET  = 1.07; ! Target retrun;
+
+!HRD  EXPRET  = 0.9853,1.2487,1.1279,1.0995,1.0531,1.0868,1.0992,1.0722,1.1089; ! Expected return;
+
+!HRD  STDDEV  = 0.4134,0.5698,0.2883,0.2935,0.1550,0.2266,0.1946,0.6275,0.2194; ! Standard deviation;
+
+            ! Alcoa    Ford     Deere    Dupont   PandG    Chevron  3M       USsteel  Mcrsft; 
+!HRD  CORR  = 1.0000   0.5388   0.6670   0.6312   0.2909   0.5687   0.6028   0.6506   0.4155  ! Alcoa;
+!HRD                   1.0000   0.6204   0.5321   0.1150   0.3330   0.3775   0.4368   0.2620  ! Ford;
+!HRD                            1.0000   0.6837   0.3213   0.4626   0.5921   0.6108   0.3577  ! Deere;
+!HRD                                     1.0000   0.3715   0.4817   0.6796   0.5356   0.4646  ! Dupont;
+!HRD                                              1.0000   0.3688   0.5061   0.2056   0.4199  ! PandG;
+!HRD                                                       1.0000   0.5976   0.4257   0.4010  ! Chevron;
+!HRD                                                                1.0000   0.4421   0.4723  ! 3M;
+!HRD                                                                         1.0000   0.3526  ! USsteel;
+!HRD                                                                                  1.0000; ! Mcrsft ;
+
+
+ENDDATA
+
+END

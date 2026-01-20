@@ -1,10 +1,10 @@
-#define NPY_NO_DEPRECATED_API NPY_1_20_API_VERSION 
+#define NPY_NO_DEPRECATED_API NPY_2_0_API_VERSION 
 #include "Python.h"
 #include <numpy/arrayobject.h>
 #include "stdlib.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "lingd21.h"
+#include "lingd22.h"
 #include "string.h"
 
 
