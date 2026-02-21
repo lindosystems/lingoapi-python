@@ -42,3 +42,6 @@ MANIFEST
 *.bat
 Dockerfile
 .pypirc
+DOCKER_NOTES.md
+*.lic
+*.gz
