@@ -83,5 +83,6 @@ def main():
     if bd.platform == 'Windows' or bd.platform == "CYGWIN_NT-6.3":
         windows(bd)
     else:
-        linux(bd)
+        pass
+        #linux(bd)
 main()

@@ -67,7 +67,7 @@ if bd.platform == 'Windows':
 if bd.platform == 'Linux':
     IncludePath = os.path.join(bd.LINGO64_HOME,'programming_samples')
     LingoLib = 'lingd64_' + bd.MAJOR
-    LibPath = os.path.join(bd.LINGO64_HOME, 'bin/linux64')
+    LibPath = os.path.join(bd.LINGO64_HOME, 'bin')
 
     extra_link_args = '-Wl,-rpath-link,' + LibPath + ' -Wl,-rpath,' + LibPath
     macros = []
