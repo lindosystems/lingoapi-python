@@ -79,8 +79,8 @@ class LoadException():
 
     def __init__(self):
 
-        self.LINGO_HOME = os.environ.get('LINGO_21_HOME')
-        self.LINGO64_HOME = os.environ.get('LINGO64_21_HOME')
+        self.LINGO_HOME = os.environ.get('LINGO_22_HOME')
+        self.LINGO64_HOME = os.environ.get('LINGO64_22_HOME')
         self.platform     = platform.system()
         self.is_64bits    = sys.maxsize > 2**32
         self.errorMessage = self.getMessage()
@@ -97,13 +97,13 @@ class LoadException():
                         Libifcoremd.dll                                                         \n\
                         Libiomp5md.dll                                                          \n\
                         Libmmd.dll                                                              \n\
-                        Lindo64_14_0.dll                                                        \n\
+                        Lindo64_16_0.dll                                                        \n\
                         Lindopr64_11.dll                                                         \n\
                         Lingd64_21.dll                                                          \n\
                         Lingdb64_3.dll                                                          \n\
-                        Lingf64_21.dll                                                          \n\
-                        Lingfd64_21.dll                                                         \n\
-                        Lingj64_21.dll                                                          \n\
+                        Lingf64_22.dll                                                          \n\
+                        Lingfd64_22.dll                                                         \n\
+                        Lingj64_22.dll                                                          \n\
                         Lingoau64_14.dll                                                        \n\
                         Lingr64_1.dll                                                           \n\
                         Lingxl64_5.dll                                                          \n\
@@ -147,7 +147,7 @@ class LoadException():
                     "
 
         else:
-            pathTolibs = os.path.join(self.LINGO64_HOME,"bin/linux64/")
+            pathTolibs = os.path.join(self.LINGO_HOME,"bin/")
             msg = "Lingo Import Error:                                                            \n\
                         Make sure all the following files are present in "+ pathTolibs  + ":      \n\
                         libQt5Core.so.5                                                           \n\
@@ -186,14 +186,14 @@ class LoadException():
                         liblindo64.so.13                                                          \n\
                         liblindo64.so.13.0                                                        \n\
                         liblingo64.so                                                             \n\
-                        liblingo64.so.19                                                          \n\
-                        liblingo64.so.19.0                                                        \n\
+                        liblingo64.so.22                                                          \n\
+                        liblingo64.so.22.0                                                        \n\
                         liblingogui64.so                                                          \n\
-                        liblingogui64.so.19                                                       \n\
-                        liblingogui64.so.19.0                                                     \n\
+                        liblingogui64.so.22                                                       \n\
+                        liblingogui64.so.22.0                                                     \n\
                         liblingojni64.so                                                          \n\
-                        liblingojni64.so.19                                                       \n\
-                        liblingojni64.so.19.0                                                     \n\
+                        liblingojni64.so.22                                                       \n\
+                        liblingojni64.so.22.0                                                     \n\
                         libmosek64.so                                                             \n\
                         libmosek64.so.9                                                           \n\
                         libmosek64.so.9.2                                                         \n\
