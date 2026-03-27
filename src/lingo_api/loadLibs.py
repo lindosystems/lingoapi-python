@@ -59,7 +59,7 @@ def windows(bd:BuildData):
 #
 def linux(bd:BuildData):
     
-    libircPath = os.path.join(bd.LINGO64_HOME,"bin/linux64/libirc.so")
+    libircPath = os.path.join(bd.LINGO_HOME,"bin/linux64/libirc.so")
     try:
         cdll.LoadLibrary(libircPath)
     except Exception as e:
@@ -74,8 +74,11 @@ def main():
     bd = BuildData()
     ## print(bd) # If Debug
     #Environment variable LINDOAPI_HOME must be set
-    if bd.LINGO64_HOME == None:
+    if bd.LINGO_HOME == None and (bd.is_64bits == False or bd.platform != 'Windows'):
         raise NoEviromentVar("LINGO_22_HOME", "Lingo22")
+
+    if bd.LINGO64_HOME == None and bd.is_64bits and bd.platform == 'Windows':
+        raise NoEviromentVar("LINGO64_22_HOME", "Lingo64_22")
 
 
 
