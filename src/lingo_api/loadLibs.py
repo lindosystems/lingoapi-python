@@ -74,11 +74,8 @@ def main():
     bd = BuildData()
     ## print(bd) # If Debug
     #Environment variable LINDOAPI_HOME must be set
-    if bd.LINGO_HOME == None and (bd.is_64bits == False or bd.platform != 'Windows'):
+    if bd.LINGO64_HOME == None:
         raise NoEviromentVar("LINGO_22_HOME", "Lingo22")
-
-    if bd.LINGO64_HOME == None and bd.is_64bits and bd.platform == 'Windows':
-        raise NoEviromentVar("LINGO64_22_HOME", "Lingo64_22")
 
 
 
