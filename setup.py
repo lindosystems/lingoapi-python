@@ -10,7 +10,7 @@ import platform
 
 
 
-VERSION = "22.0.1"
+VERSION = "22.0.2"
 
 class BuildData():
     """
@@ -22,7 +22,7 @@ class BuildData():
     """
     def __init__(self):
         self.MAJOR = "22"
-        self.MINOR = "1"
+        self.MINOR = "2"
         self.LINGO_HOME = os.environ.get('LINGO_22_HOME')
         self.LINGO64_HOME = os.environ.get('LINGO64_22_HOME')
         self.platform = platform.system()
@@ -65,9 +65,9 @@ if bd.platform == 'Windows':
     extra_link_args = '-Wl,--enable-stdcall-fixup'
 
 if bd.platform == 'Linux':
-    IncludePath = os.path.join(bd.LINGO_HOME,'programming_samples')
+    IncludePath = os.path.join(bd.LINGO64_HOME,'programming_samples')
     LingoLib = 'lingd64_' + bd.MAJOR
-    LibPath = os.path.join(bd.LINGO_HOME, 'bin')
+    LibPath = os.path.join(bd.LINGO64_HOME, 'bin/linux64')
 
     extra_link_args = '-Wl,-rpath-link,' + LibPath + ' -Wl,-rpath,' + LibPath
     macros = []

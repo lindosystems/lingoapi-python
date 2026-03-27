@@ -147,7 +147,7 @@ class LoadException():
                     "
 
         else:
-            pathTolibs = os.path.join(self.LINGO_HOME,"bin/")
+            pathTolibs = os.path.join(self.LINGO64_HOME,"bin/linux64")
             msg = "Lingo Import Error:                                                            \n\
                         Make sure all the following files are present in "+ pathTolibs  + ":      \n\
                         libQt5Core.so.5                                                           \n\

@@ -7,7 +7,7 @@ import lingo_api as lingo
 
 pEnv = lingo.pyLScreateEnvLng()
 if pEnv is None:
-    e("cannot create LINGO environment!")
+    print("cannot create LINGO environment!")
     exit(1)
 
 errorcode = lingo.pyLSdeleteEnvLng(pEnv)
